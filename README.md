@@ -2,7 +2,7 @@
 
 This comprehensive study guide covers the "30 Days of Pandas" challenge, providing structured solutions and explanations for data manipulation problems using pandas. Each problem includes complete analysis, solution code, and detailed reasoning.
 
-## Study Plan Overview
+## 📚 Study Plan Overview
 
 The 30 Days of Pandas challenge covers essential data manipulation concepts:
 - Data Filtering & Selection
@@ -13,7 +13,7 @@ The 30 Days of Pandas challenge covers essential data manipulation concepts:
 - Date/Time Manipulation
 - Advanced Data Analysis
 
-## Template Structure
+## 📋 Template Structure
 
 Each problem follows this format:
 - **Problem Description**: Clear explanation of the task
@@ -132,6 +132,11 @@ def find_products(products: pd.DataFrame) -> pd.DataFrame:
 - String equality comparison in pandas
 - Single column DataFrame selection
 
+**Documentation**:
+- [Boolean Indexing](https://pandas.pydata.org/docs/user_guide/indexing.html#boolean-indexing)
+- [Logical Operators](https://pandas.pydata.org/docs/user_guide/boolean.html)
+- [DataFrame Selection](https://pandas.pydata.org/docs/user_guide/indexing.html#selection-by-label)
+
 ---
 
 ## Day 3: String Methods
@@ -166,44 +171,106 @@ def find_customer_referee(customer: pd.DataFrame) -> pd.DataFrame:
 - `!=` - Not equal comparison
 - Handling null values in filtering
 
+**Documentation**:
+- [Working with missing data](https://pandas.pydata.org/docs/user_guide/missing_data.html)
+- [pandas.isna()](https://pandas.pydata.org/docs/reference/api/pandas.isna.html)
+- [Comparison Operations](https://pandas.pydata.org/docs/reference/ops.html)
+
 ---
 
 ## Day 4: Data Transformation
 
-### Problem: Article Views
+### Problem: Article Views I
 **Difficulty**: Easy
 
 **Description**: 
-Find authors who viewed their own articles, sorted by id.
+Find all the authors who viewed at least one of their own articles. Return the result table sorted by id in ascending order.
+
+**Table Schema**:
+```sql
+Table: Views
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| article_id    | int     |
+| author_id     | int     |
+| viewer_id     | int     |
+| view_date     | date    |
++---------------+---------+
+```
+
+**Sample Data**:
+| article_id | author_id | viewer_id | view_date  |
+|------------|-----------|-----------|------------|
+| 1          | 3         | 5         | 2019-08-01 |
+| 1          | 3         | 6         | 2019-08-02 |
+| 2          | 7         | 7         | 2019-08-01 |
+| 2          | 7         | 6         | 2019-08-02 |
+| 4          | 7         | 1         | 2019-07-22 |
+| 3          | 4         | 4         | 2019-07-21 |
+| 3          | 4         | 4         | 2019-07-21 |
+
+**Expected Output**:
+| id |
+|----|
+| 4  |
+| 7  |
 
 **Solution**:
 ```python
 import pandas as pd
 
 def article_views(views: pd.DataFrame) -> pd.DataFrame:
-    # Find rows where author_id equals viewer_id
+    # Find rows where author_id equals viewer_id (authors viewing their own articles)
     self_views = views[views['author_id'] == views['viewer_id']]
     
     # Get unique author_ids and sort them
     unique_authors = self_views['author_id'].drop_duplicates().sort_values()
     
-    # Create result DataFrame
+    # Create result DataFrame with renamed column
     result = pd.DataFrame({'id': unique_authors})
     
     return result
 ```
 
+**Alternative Solution using unique():**
+```python
+import pandas as pd
+
+def article_views(views: pd.DataFrame) -> pd.DataFrame:
+    # Filter for self-views and get unique sorted author IDs
+    self_viewing_authors = views[views['author_id'] == views['viewer_id']]['author_id'].unique()
+    
+    # Sort and create result DataFrame
+    result = pd.DataFrame({'id': sorted(self_viewing_authors)})
+    
+    return result
+```
+
 **Reasoning**:
-1. **Column Comparison**: Compare two columns within the same DataFrame
-2. **Deduplication**: Use `drop_duplicates()` to get unique values
-3. **Sorting**: Use `sort_values()` for ascending order
-4. **DataFrame Creation**: Build new DataFrame with renamed column
+1. **Self-Reference Detection**: Compare `author_id` and `viewer_id` to find authors viewing their own content
+2. **Deduplication**: Use `drop_duplicates()` or `unique()` to get distinct authors
+3. **Sorting**: Use `sort_values()` or `sorted()` for ascending order
+4. **DataFrame Creation**: Build new DataFrame with properly named column
+5. **Multiple Approaches**: Show different ways to achieve the same result
 
 **Key Concepts**:
-- Column-to-column comparison
-- `drop_duplicates()` - Remove duplicate values
-- `sort_values()` - Sort DataFrame/Series
-- `pd.DataFrame()` - Create new DataFrame
+- Column-to-column comparison within same DataFrame
+- `drop_duplicates()` vs `unique()` for deduplication
+- `sort_values()` vs `sorted()` for ordering
+- DataFrame creation and column naming
+- Self-referential data analysis
+
+**Performance Notes**:
+- `unique()` + `sorted()` can be more memory efficient for large datasets
+- `drop_duplicates()` + `sort_values()` preserves pandas Series structure
+- Both approaches are valid and perform similarly for most use cases
+
+**Documentation**:
+- [pandas.DataFrame.drop_duplicates](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.drop_duplicates.html)
+- [pandas.unique](https://pandas.pydata.org/docs/reference/api/pandas.unique.html)
+- [pandas.DataFrame.sort_values](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.sort_values.html)
+- [DataFrame Creation](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html)
 
 ---
 
@@ -247,6 +314,11 @@ def invalid_tweets(tweets: pd.DataFrame) -> pd.DataFrame:
 - `.str.len()` - Get string length in pandas
 - String accessor methods with `.str`
 - Length-based filtering
+
+**Documentation**:
+- [String Methods](https://pandas.pydata.org/docs/user_guide/text.html)
+- [pandas.Series.str.len](https://pandas.pydata.org/docs/reference/api/pandas.Series.str.len.html)
+- [String Accessor](https://pandas.pydata.org/docs/reference/series.html#string-handling)
 
 ---
 
@@ -301,6 +373,11 @@ def calculate_special_bonus(employees: pd.DataFrame) -> pd.DataFrame:
 - Modulo operator `%` for odd/even checking
 - Complex conditional logic in pandas
 
+**Documentation**:
+- [pandas.DataFrame.apply](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.apply.html)
+- [pandas.Series.str.startswith](https://pandas.pydata.org/docs/reference/api/pandas.Series.str.startswith.html)
+- [Lambda Functions in Pandas](https://pandas.pydata.org/docs/user_guide/basics.html#function-application)
+
 ---
 
 ## Day 7: Data Selection & Sorting
@@ -345,6 +422,11 @@ def fix_names(users: pd.DataFrame) -> pd.DataFrame:
 - `.str.capitalize()` - Proper case conversion
 - Column assignment and modification
 - Basic sorting operations
+
+**Documentation**:
+- [pandas.Series.str.capitalize](https://pandas.pydata.org/docs/reference/api/pandas.Series.str.capitalize.html)
+- [pandas.DataFrame.sort_values](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.sort_values.html)
+- [String Methods](https://pandas.pydata.org/docs/user_guide/text.html)
 
 ---
 
@@ -392,6 +474,11 @@ def find_patients(patients: pd.DataFrame) -> pd.DataFrame:
 - Word boundary regex `\b`
 - Handling null values in string operations
 - Regular expressions in pandas
+
+**Documentation**:
+- [pandas.Series.str.contains](https://pandas.pydata.org/docs/reference/api/pandas.Series.str.contains.html)
+- [Regular Expressions in Python](https://docs.python.org/3/library/re.html)
+- [String Methods with regex](https://pandas.pydata.org/docs/user_guide/text.html#method-summary)
 
 ---
 
@@ -442,6 +529,12 @@ def categorize_products(activities: pd.DataFrame) -> pd.DataFrame:
 - Lambda functions in aggregation
 - `reset_index()` for DataFrame conversion
 
+**Documentation**:
+- [GroupBy Operations](https://pandas.pydata.org/docs/user_guide/groupby.html)
+- [pandas.DataFrame.agg](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.agg.html)
+- [pandas.Series.nunique](https://pandas.pydata.org/docs/reference/api/pandas.Series.nunique.html)
+- [pandas.DataFrame.reset_index](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.reset_index.html)
+
 ---
 
 ## Day 10: Advanced GroupBy
@@ -488,6 +581,11 @@ def daily_leads_and_partners(daily_sales: pd.DataFrame) -> pd.DataFrame:
 - Multi-column groupby
 - `nunique()` aggregation
 - Meaningful column naming in aggregation
+
+**Documentation**:
+- [GroupBy with Multiple Columns](https://pandas.pydata.org/docs/user_guide/groupby.html#grouping-with-a-grouper-specification)
+- [pandas.Series.nunique](https://pandas.pydata.org/docs/reference/api/pandas.Series.nunique.html)
+- [Aggregation Operations](https://pandas.pydata.org/docs/user_guide/groupby.html#aggregation)
 
 ---
 
@@ -547,6 +645,11 @@ def employee_bonus(employee: pd.DataFrame, bonus: pd.DataFrame) -> pd.DataFrame:
 - Left joins with `how='left'`
 - Post-merge filtering
 - Handling null values from joins
+
+**Documentation**:
+- [Merge and Join Operations](https://pandas.pydata.org/docs/user_guide/merging.html)
+- [pandas.DataFrame.merge](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.merge.html)
+- [Join Types](https://pandas.pydata.org/docs/user_guide/merging.html#database-style-dataframe-or-named-series-joining-merging)
 
 ---
 
@@ -625,6 +728,12 @@ def students_and_examinations(students: pd.DataFrame, subjects: pd.DataFrame,
 - `fillna()` for missing value handling
 - `astype()` for type conversion
 
+**Documentation**:
+- [Cross Join Operations](https://pandas.pydata.org/docs/user_guide/merging.html#cross-merge)
+- [pandas.DataFrame.fillna](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.fillna.html)
+- [pandas.DataFrame.astype](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.astype.html)
+- [GroupBy size](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.GroupBy.size.html)
+
 ---
 
 ## Day 13: Advanced Filtering
@@ -679,6 +788,11 @@ def find_managers(employee: pd.DataFrame) -> pd.DataFrame:
 - Self-referencing joins
 - Groupby counting with threshold filtering
 - Multi-step data transformation
+
+**Documentation**:
+- [Self-Joins](https://pandas.pydata.org/docs/user_guide/merging.html#joining-on-index)
+- [GroupBy size operations](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.GroupBy.size.html)
+- [Multi-step transformations](https://pandas.pydata.org/docs/user_guide/basics.html#pipe)
 
 ---
 
@@ -759,9 +873,143 @@ def sales_person(sales_person: pd.DataFrame, company: pd.DataFrame,
 - Multi-table filtering logic
 - Edge case handling
 
+**Documentation**:
+- [pandas.DataFrame.isin](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.isin.html)
+- [Boolean Operations](https://pandas.pydata.org/docs/user_guide/boolean.html)
+- [Set Operations](https://pandas.pydata.org/docs/user_guide/indexing.html#set-operations-on-the-other-axes)
+
 ---
 
-## Day 15: Complex Joins
+## Day 15: Missing Relationships
+
+### Problem: Customers Who Never Order
+**Difficulty**: Easy
+
+**Description**: 
+Find all customers who never placed any order.
+
+**Table Schema**:
+```sql
+Table: Customers
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| id          | int     |
+| name        | varchar |
++-------------+---------+
+
+Table: Orders
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| id          | int     |
+| customerId  | int     |
++-------------+---------+
+```
+
+**Sample Data**:
+| Customers |         |
+|-----------|---------|
+| id        | name    |
+| 1         | Joe     |
+| 2         | Henry   |
+| 3         | Sam     |
+| 4         | Max     |
+
+| Orders |            |
+|--------|------------|
+| id     | customerId |
+| 1      | 3          |
+| 2      | 1          |
+
+**Expected Output**:
+| Customers |
+|-----------|
+| Henry     |
+| Max       |
+
+**Solution**:
+```python
+import pandas as pd
+
+def find_customers(customers: pd.DataFrame, orders: pd.DataFrame) -> pd.DataFrame:
+    # Left join customers with orders to identify customers without orders
+    merged = customers.merge(orders, left_on='id', right_on='customerId', how='left')
+    
+    # Find customers with no orders (null customerId after left join)
+    customers_no_orders = merged[merged['customerId'].isna()]
+    
+    # Return customer names
+    result = customers_no_orders[['name']]
+    result.columns = ['Customers']
+    
+    return result
+```
+
+**Alternative Solution using isin():**
+```python
+import pandas as pd
+
+def find_customers(customers: pd.DataFrame, orders: pd.DataFrame) -> pd.DataFrame:
+    # Get list of customer IDs who have placed orders
+    customers_with_orders = orders['customerId'].unique()
+    
+    # Find customers NOT in the orders list
+    customers_no_orders = customers[~customers['id'].isin(customers_with_orders)]
+    
+    # Return customer names
+    result = customers_no_orders[['name']]
+    result.columns = ['Customers']
+    
+    return result
+```
+
+**Alternative Solution using set operations:**
+```python
+import pandas as pd
+
+def find_customers(customers: pd.DataFrame, orders: pd.DataFrame) -> pd.DataFrame:
+    # Convert to sets for efficient set operations
+    all_customers = set(customers['id'])
+    customers_with_orders = set(orders['customerId'])
+    
+    # Find customers who never ordered using set difference
+    customers_no_orders = all_customers - customers_with_orders
+    
+    # Filter original dataframe and return names
+    result = customers[customers['id'].isin(customers_no_orders)][['name']]
+    result.columns = ['Customers']
+    
+    return result
+```
+
+**Reasoning**:
+1. **Missing Relationship Detection**: Identify customers who don't appear in orders table
+2. **Left Join Approach**: Use left join to preserve all customers, then find nulls
+3. **Negation with isin()**: Use `~` operator with `isin()` for exclusion logic  
+4. **Set Operations**: Leverage mathematical set difference for clean logic
+5. **Column Renaming**: Ensure output matches expected format
+
+**Key Concepts**:
+- Left joins to detect missing relationships
+- `isin()` with negation operator `~`
+- Set operations for membership testing
+- Null value detection after joins
+- Multiple solution approaches for the same problem
+
+**Performance Considerations**:
+- **Left Join**: Good for small to medium datasets, clear logic
+- **isin() Method**: More efficient for larger datasets, direct filtering
+- **Set Operations**: Most efficient for very large datasets, mathematical approach
+
+**Documentation**:
+- [Pandas Merge](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.merge.html)
+- [isin() Method](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.isin.html)
+- [Set Operations in Python](https://docs.python.org/3/library/stdtypes.html#set-types-set-frozenset)
+
+---
+
+## Day 16: Complex Joins
 
 ### Problem: Customer Who Visited but Did Not Make Any Transactions
 **Difficulty**: Easy
@@ -815,6 +1063,11 @@ def find_customers(visits: pd.DataFrame, transactions: pd.DataFrame) -> pd.DataF
 - Left joins to detect missing relationships
 - Null value detection after joins
 - Aggregation on filtered results
+
+**Documentation**:
+- [Left Join Operations](https://pandas.pydata.org/docs/user_guide/merging.html#database-style-dataframe-or-named-series-joining-merging)
+- [Working with Missing Data](https://pandas.pydata.org/docs/user_guide/missing_data.html)
+- [Aggregation after filtering](https://pandas.pydata.org/docs/user_guide/groupby.html#filtration)
 
 ---
 
@@ -872,6 +1125,11 @@ def rising_temperature(weather: pd.DataFrame) -> pd.DataFrame:
 - Date arithmetic with `.dt.days`
 - Window-like operations without window functions
 
+**Documentation**:
+- [pandas.DataFrame.shift](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.shift.html)
+- [Date/Time Operations](https://pandas.pydata.org/docs/user_guide/timeseries.html)
+- [Time Deltas](https://pandas.pydata.org/docs/user_guide/timedeltas.html)
+
 ---
 
 ## Day 17: Aggregation & Ranking
@@ -919,55 +1177,131 @@ def game_analysis(activity: pd.DataFrame) -> pd.DataFrame:
 - `min()` aggregation function
 - Column renaming techniques
 
+**Documentation**:
+- [GroupBy min operations](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.GroupBy.min.html)
+- [Column Operations](https://pandas.pydata.org/docs/user_guide/basics.html#column-selection-addition-deletion)
+- [Aggregation Functions](https://pandas.pydata.org/docs/user_guide/groupby.html#aggregation)
+
 ---
 
 ## Day 18: Advanced String Operations
 
-### Problem: Triangle Judgement
+### Problem: Find Users With Valid E-Mails
 **Difficulty**: Easy
 
 **Description**: 
-Determine if three lengths can form a triangle.
+Find users who have valid emails. A valid e-mail has a prefix name and a domain where:
+- The prefix name is a string that may contain letters (upper or lower case), digits, underscore '_', period '.', and/or dash '-'. The prefix name must start with a letter.
+- The domain is '@leetcode.com'.
 
 **Table Schema**:
 ```sql
-Table: Triangle
-+----------------+---------+
-| Column Name    | Type    |
-+----------------+---------+
-| x              | int     |
-| y              | int     |
-| z              | int     |
-+----------------+---------+
+Table: Users
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| user_id       | int     |
+| name          | varchar |
+| mail          | varchar |
++---------------+---------+
 ```
+
+**Sample Data**:
+| user_id | name      | mail                    |
+|---------|-----------|-------------------------|
+| 1       | Winston   | winston@leetcode.com    |
+| 2       | Jonathan  | jonathanisgreat         |
+| 3       | Annabelle | bella-@leetcode.com     |
+| 4       | Sally     | sally.come@leetcode.com |
+| 5       | Marwan    | quarz#2020@leetcode.com |
+| 6       | David     | david69@gmail.com       |
+| 7       | Shapiro   | .shapo@leetcode.com     |
+
+**Expected Output**:
+| user_id | name      | mail                    |
+|---------|-----------|-------------------------|
+| 1       | Winston   | winston@leetcode.com    |
+| 3       | Annabelle | bella-@leetcode.com     |
+| 4       | Sally     | sally.come@leetcode.com |
 
 **Solution**:
 ```python
 import pandas as pd
 
-def triangle_judgement(triangle: pd.DataFrame) -> pd.DataFrame:
-    # Apply triangle inequality theorem
-    triangle['triangle'] = triangle.apply(
-        lambda row: 'Yes' if (
-            row['x'] + row['y'] > row['z'] and
-            row['x'] + row['z'] > row['y'] and
-            row['y'] + row['z'] > row['x']
-        ) else 'No',
-        axis=1
+def valid_emails(users: pd.DataFrame) -> pd.DataFrame:
+    # Define regex pattern for valid email
+    # ^[a-zA-Z] - must start with letter
+    # [a-zA-Z0-9._-]* - followed by letters, digits, underscore, period, or dash
+    # @leetcode\.com$ - must end with @leetcode.com
+    pattern = r'^[a-zA-Z][a-zA-Z0-9._-]*@leetcode\.com$'
+    
+    # Filter users with valid emails
+    valid_users = users[users['mail'].str.match(pattern, na=False)]
+    
+    return valid_users
+```
+
+**Alternative Solution using contains():**
+```python
+import pandas as pd
+
+def valid_emails(users: pd.DataFrame) -> pd.DataFrame:
+    # More explicit regex pattern with contains
+    pattern = r'^[a-zA-Z][a-zA-Z0-9._-]*@leetcode\.com$'
+    
+    # Filter users with valid emails using contains with full match
+    valid_users = users[users['mail'].str.contains(pattern, regex=True, na=False)]
+    
+    return valid_users
+```
+
+**Alternative Solution with step-by-step validation:**
+```python
+import pandas as pd
+
+def valid_emails(users: pd.DataFrame) -> pd.DataFrame:
+    # Create boolean conditions for each validation rule
+    conditions = (
+        # Must end with @leetcode.com
+        users['mail'].str.endswith('@leetcode.com') &
+        # Extract prefix (everything before @leetcode.com)
+        users['mail'].str.replace('@leetcode.com', '').str.match(r'^[a-zA-Z][a-zA-Z0-9._-]*$', na=False)
     )
     
-    return triangle
+    return users[conditions]
 ```
 
 **Reasoning**:
-1. **Mathematical Logic**: Apply triangle inequality theorem
-2. **Row-wise Operations**: Use `apply()` with `axis=1`
-3. **Conditional Assignment**: Complex if-else logic in lambda
+1. **Regex Pattern Construction**: Build pattern to match all email requirements
+2. **Prefix Validation**: Ensure prefix starts with letter and contains only valid characters
+3. **Domain Validation**: Verify exact domain match with escaped dot
+4. **String Matching**: Use `str.match()` for full pattern matching from start
+5. **Null Handling**: Use `na=False` to treat NaN values as non-matching
 
 **Key Concepts**:
-- `apply()` with complex logic
-- Mathematical conditions in pandas
-- String result assignment
+- Regular expressions for complex string validation
+- `str.match()` vs `str.contains()` for pattern matching
+- Character classes `[a-zA-Z0-9._-]` for allowed characters
+- Anchors `^` and `$` for start/end matching
+- Escaping special characters with backslash `\.`
+- Multiple validation approaches for the same problem
+
+**Regex Breakdown**:
+- `^` - Start of string
+- `[a-zA-Z]` - First character must be a letter
+- `[a-zA-Z0-9._-]*` - Zero or more valid prefix characters
+- `@leetcode\.com` - Literal domain (dot escaped)
+- `$` - End of string
+
+**Performance Notes**:
+- `str.match()` is generally faster for full pattern matching
+- `str.contains()` with anchors achieves same result but may be slower
+- Step-by-step validation can be more readable but less efficient
+
+**Documentation**:
+- [Pandas String Methods](https://pandas.pydata.org/docs/user_guide/text.html)
+- [Regular Expressions in Python](https://docs.python.org/3/library/re.html)
+- [str.match() Documentation](https://pandas.pydata.org/docs/reference/api/pandas.Series.str.match.html)
 
 ---
 
@@ -1023,6 +1357,474 @@ def biggest_single_number(my_numbers: pd.DataFrame) -> pd.DataFrame:
 
 ---
 
+### Problem: Nth Highest Salary
+**Difficulty**: Medium
+
+**Description**: 
+Write a solution to find the nth highest salary from the Employee table. If there is no nth highest salary, return null.
+
+**Table Schema**:
+```sql
+Table: Employee
++-------------+------+
+| Column Name | Type |
++-------------+------+
+| id          | int  |
+| salary      | int  |
++-------------+------+
+```
+
+**Sample Data**:
+| id | salary |
+|----|--------|
+| 1  | 100    |
+| 2  | 200    |
+| 3  | 300    |
+
+**Expected Output for N=2**:
+| getNthHighestSalary(2) |
+|------------------------|
+| 200                    |
+
+**Expected Output for N=4**:
+| getNthHighestSalary(4) |
+|------------------------|
+| null                   |
+
+**Solution**:
+```python
+import pandas as pd
+
+def nth_highest_salary(employee: pd.DataFrame, N: int) -> pd.DataFrame:
+    # Remove duplicates and sort salaries in descending order
+    unique_salaries = employee['salary'].drop_duplicates().sort_values(ascending=False)
+    
+    # Check if N is valid and within range
+    if N <= 0 or N > len(unique_salaries):
+        nth_salary = None
+    else:
+        # Get the Nth highest salary (N-1 index since 0-based)
+        nth_salary = unique_salaries.iloc[N-1]
+    
+    # Return result in expected format
+    result = pd.DataFrame({f'getNthHighestSalary({N})': [nth_salary]})
+    
+    return result
+```
+
+**Alternative Solution using nlargest():**
+```python
+import pandas as pd
+
+def nth_highest_salary(employee: pd.DataFrame, N: int) -> pd.DataFrame:
+    # Get N largest unique salaries
+    unique_salaries = employee['salary'].drop_duplicates()
+    
+    if N <= 0 or N > len(unique_salaries):
+        nth_salary = None
+    else:
+        # Use nlargest to get top N salaries, then take the last one
+        top_n_salaries = unique_salaries.nlargest(N)
+        nth_salary = top_n_salaries.iloc[-1] if len(top_n_salaries) == N else None
+    
+    result = pd.DataFrame({f'getNthHighestSalary({N})': [nth_salary]})
+    
+    return result
+```
+
+**Alternative Solution using rank():**
+```python
+import pandas as pd
+
+def nth_highest_salary(employee: pd.DataFrame, N: int) -> pd.DataFrame:
+    # Create salary ranks (dense ranking to handle duplicates)
+    employee_copy = employee.copy()
+    employee_copy['rank'] = employee_copy['salary'].rank(method='dense', ascending=False)
+    
+    # Find the Nth highest salary
+    nth_salary_rows = employee_copy[employee_copy['rank'] == N]
+    
+    if nth_salary_rows.empty:
+        nth_salary = None
+    else:
+        nth_salary = nth_salary_rows['salary'].iloc[0]
+    
+    result = pd.DataFrame({f'getNthHighestSalary({N})': [nth_salary]})
+    
+    return result
+```
+
+**Reasoning**:
+1. **Duplicate Handling**: Use `drop_duplicates()` to ensure unique salary values
+2. **Sorting**: Sort salaries in descending order to rank from highest to lowest
+3. **Index Access**: Use `iloc[N-1]` for 0-based indexing to get Nth position
+4. **Boundary Checking**: Validate N is within valid range (1 to number of unique salaries)
+5. **Null Handling**: Return None when N is out of range or invalid
+6. **Column Naming**: Create dynamic column name matching expected SQL function format
+
+**Key Concepts**:
+- `drop_duplicates()` for handling duplicate salary values
+- `sort_values()` with `ascending=False` for descending order
+- `iloc[]` for positional indexing
+- `nlargest()` as alternative for top-N selection
+- `rank()` method for creating salary rankings
+- Boundary condition validation
+- Dynamic DataFrame column naming
+
+**Ranking Methods Comparison**:
+- **Sort + Index**: Most straightforward, good performance
+- **nlargest()**: Pandas optimized method, efficient for top-N queries
+- **rank()**: Most flexible, handles ties explicitly with different methods
+
+**Edge Cases Handled**:
+- N ≤ 0: Invalid input, return null
+- N > unique salary count: No Nth salary exists, return null
+- Duplicate salaries: Only count unique values for ranking
+- Empty table: Return null when no data exists
+
+**Performance Notes**:
+- `drop_duplicates()` + `sort_values()`: Good general performance
+- `nlargest()`: Optimized for top-N operations, faster for small N
+- `rank()`: More memory intensive but handles complex tie scenarios
+
+**Documentation**:
+- [Pandas drop_duplicates()](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.drop_duplicates.html)
+- [Pandas nlargest()](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.nlargest.html)
+- [Pandas rank()](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.rank.html)
+
+---
+
+### Problem: Second Highest Salary
+**Difficulty**: Medium
+
+**Description**: 
+Write a solution to find the second highest salary from the Employee table. If there is no second highest salary, return null.
+
+**Table Schema**:
+```sql
+Table: Employee
++-------------+------+
+| Column Name | Type |
++-------------+------+
+| id          | int  |
+| salary      | int  |
++-------------+------+
+```
+
+**Sample Data**:
+| id | salary |
+|----|--------|
+| 1  | 100    |
+| 2  | 200    |
+| 3  | 300    |
+
+**Expected Output**:
+| SecondHighestSalary |
+|---------------------|
+| 200                 |
+
+**Solution**:
+```python
+import pandas as pd
+
+def second_highest_salary(employee: pd.DataFrame) -> pd.DataFrame:
+    # Remove duplicates and sort salaries in descending order
+    unique_salaries = employee['salary'].drop_duplicates().sort_values(ascending=False)
+    
+    # Check if there are at least 2 unique salaries
+    if len(unique_salaries) < 2:
+        second_highest = None
+    else:
+        # Get the second highest salary
+        second_highest = unique_salaries.iloc[1]
+    
+    # Return result in expected format
+    result = pd.DataFrame({'SecondHighestSalary': [second_highest]})
+    
+    return result
+```
+
+**Alternative Solution using nlargest():**
+```python
+import pandas as pd
+
+def second_highest_salary(employee: pd.DataFrame) -> pd.DataFrame:
+    # Get unique salaries and find 2 largest
+    unique_salaries = employee['salary'].drop_duplicates().nlargest(2)
+    
+    # Check if we have a second highest
+    if len(unique_salaries) < 2:
+        second_highest = None
+    else:
+        second_highest = unique_salaries.iloc[1]
+    
+    result = pd.DataFrame({'SecondHighestSalary': [second_highest]})
+    
+    return result
+```
+
+**Reasoning**:
+1. **Duplicate Removal**: Ensure we only consider unique salary values
+2. **Sorting**: Order salaries from highest to lowest
+3. **Length Check**: Verify we have at least 2 unique salaries
+4. **Index Access**: Get second position (index 1) for second highest
+5. **Null Handling**: Return None when second highest doesn't exist
+
+**Key Concepts**:
+- `drop_duplicates()` for unique values
+- `sort_values(ascending=False)` for descending order
+- `nlargest()` for top-N selection
+- `iloc[1]` for second position access
+- Edge case handling for insufficient data
+
+**Edge Cases**:
+- Only one unique salary: Return null
+- Empty table: Return null
+- All salaries identical: Return null
+- Multiple employees with same salary: Only count unique values
+
+**Documentation**:
+- [pandas.DataFrame.drop_duplicates](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.drop_duplicates.html)
+- [pandas.DataFrame.sort_values](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.sort_values.html)
+- [pandas.DataFrame.nlargest](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.nlargest.html)
+
+---
+
+### Problem: Rank Scores
+**Difficulty**: Medium
+
+**Description**: 
+Write a solution to rank the scores. The ranking should be calculated according to the following rules:
+- The scores should be ranked from the highest to the lowest.
+- If there is a tie between two scores, both should have the same ranking.
+- After a tie, the next ranking should be the next consecutive integer value.
+
+**Table Schema**:
+```sql
+Table: Scores
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| id          | int     |
+| score       | decimal |
++-------------+---------+
+```
+
+**Sample Data**:
+| id | score |
+|----|-------|
+| 1  | 3.50  |
+| 2  | 3.65  |
+| 3  | 4.00  |
+| 4  | 3.85  |
+| 5  | 4.00  |
+| 6  | 3.65  |
+
+**Expected Output**:
+| score | rank |
+|-------|------|
+| 4.00  | 1    |
+| 4.00  | 1    |
+| 3.85  | 2    |
+| 3.65  | 3    |
+| 3.65  | 3    |
+| 3.50  | 4    |
+
+**Solution**:
+```python
+import pandas as pd
+
+def order_scores(scores: pd.DataFrame) -> pd.DataFrame:
+    # Create dense ranking (consecutive integers even with ties)
+    scores['rank'] = scores['score'].rank(method='dense', ascending=False)
+    
+    # Sort by score descending
+    result = scores[['score', 'rank']].sort_values('score', ascending=False)
+    
+    # Convert rank to integer for clean display
+    result['rank'] = result['rank'].astype(int)
+    
+    return result
+```
+
+**Alternative Solution with manual ranking:**
+```python
+import pandas as pd
+
+def order_scores(scores: pd.DataFrame) -> pd.DataFrame:
+    # Sort scores in descending order
+    sorted_scores = scores.sort_values('score', ascending=False)
+    
+    # Get unique scores in descending order
+    unique_scores = sorted_scores['score'].unique()
+    
+    # Create rank mapping
+    rank_map = {score: rank for rank, score in enumerate(unique_scores, 1)}
+    
+    # Apply ranking
+    sorted_scores['rank'] = sorted_scores['score'].map(rank_map)
+    
+    return sorted_scores[['score', 'rank']]
+```
+
+**Reasoning**:
+1. **Dense Ranking**: Use `rank(method='dense')` for consecutive integer ranks
+2. **Descending Order**: `ascending=False` to rank from highest to lowest
+3. **Tie Handling**: Dense ranking assigns same rank to tied scores
+4. **Consecutive Ranks**: Next rank after ties is the next consecutive integer
+5. **Sorting**: Order final result by score descending
+
+**Key Concepts**:
+- `rank()` method with different ranking strategies
+- `method='dense'` for consecutive integer ranking
+- Handling tied values in ranking
+- Score-based sorting and ranking
+- Integer conversion for clean display
+
+**Ranking Methods Comparison**:
+- **dense**: 1, 1, 2, 3 (consecutive integers)
+- **min**: 1, 1, 3, 4 (gaps after ties)
+- **max**: 2, 2, 3, 4 (maximum position for ties)
+- **average**: 1.5, 1.5, 3, 4 (average position for ties)
+
+**Performance Notes**:
+- `rank()` method is optimized for ranking operations
+- Manual ranking with `map()` provides more control but is slower
+- Dense ranking is most appropriate for leaderboard scenarios
+
+**Documentation**:
+- [pandas.DataFrame.rank](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.rank.html)
+- [Ranking Methods](https://pandas.pydata.org/docs/user_guide/basics.html#ranking)
+- [pandas.DataFrame.sort_values](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.sort_values.html)
+
+---
+
+### Problem: Department Highest Salary
+**Difficulty**: Medium
+
+**Description**: 
+Find employees who have the highest salary in each department.
+
+**Table Schema**:
+```sql
+Table: Employee
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| id          | int     |
+| name        | varchar |
+| salary      | int     |
+| departmentId| int     |
++-------------+---------+
+
+Table: Department
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| id          | int     |
+| name        | varchar |
++-------------+---------+
+```
+
+**Sample Data**:
+| Employee |      |        |              |
+|----------|------|--------|--------------|
+| id       | name | salary | departmentId |
+| 1        | Joe  | 70000  | 1            |
+| 2        | Bob  | 80000  | 2            |
+| 3        | Henry| 80000  | 2            |
+| 4        | Sam  | 60000  | 2            |
+| 5        | Max  | 90000  | 1            |
+
+| Department |        |
+|------------|--------|
+| id         | name   |
+| 1          | IT     |
+| 2          | Sales  |
+
+**Expected Output**:
+| Department | Employee | Salary |
+|------------|----------|--------|
+| IT         | Max      | 90000  |
+| Sales      | Bob      | 80000  |
+| Sales      | Henry    | 80000  |
+
+**Solution**:
+```python
+import pandas as pd
+
+def department_highest_salary(employee: pd.DataFrame, department: pd.DataFrame) -> pd.DataFrame:
+    # Join employee and department tables
+    merged = employee.merge(department, left_on='departmentId', right_on='id', suffixes=('', '_dept'))
+    
+    # Find maximum salary per department
+    max_salaries = merged.groupby('departmentId')['salary'].max().reset_index()
+    max_salaries.columns = ['departmentId', 'max_salary']
+    
+    # Join back to get employees with maximum salary
+    result = merged.merge(max_salaries, on='departmentId')
+    result = result[result['salary'] == result['max_salary']]
+    
+    # Select and rename columns
+    final_result = result[['name_dept', 'name', 'salary']].copy()
+    final_result.columns = ['Department', 'Employee', 'Salary']
+    
+    return final_result
+```
+
+**Alternative Solution using window functions simulation:**
+```python
+import pandas as pd
+
+def department_highest_salary(employee: pd.DataFrame, department: pd.DataFrame) -> pd.DataFrame:
+    # Join tables
+    merged = employee.merge(department, left_on='departmentId', right_on='id', suffixes=('', '_dept'))
+    
+    # Create rank within each department (simulate window function)
+    merged['salary_rank'] = merged.groupby('departmentId')['salary'].rank(method='dense', ascending=False)
+    
+    # Filter employees with rank 1 (highest salary)
+    highest_salary_employees = merged[merged['salary_rank'] == 1]
+    
+    # Format result
+    result = highest_salary_employees[['name_dept', 'name', 'salary']].copy()
+    result.columns = ['Department', 'Employee', 'Salary']
+    
+    return result
+```
+
+**Reasoning**:
+1. **Table Joining**: Combine employee and department data for complete information
+2. **Group Maximum**: Find highest salary within each department
+3. **Filter Matching**: Include employees whose salary equals department maximum
+4. **Handle Ties**: Multiple employees can have the same highest salary
+5. **Result Formatting**: Return department name, employee name, and salary
+
+**Key Concepts**:
+- `merge()` for joining related tables
+- `groupby().max()` for department-wise maximums
+- Multiple employees can share highest salary (ties)
+- Window function simulation with `groupby().rank()`
+- Column aliasing with `suffixes` parameter
+
+**Edge Cases Handled**:
+- Multiple employees with same highest salary in a department
+- Departments with single employee
+- Different departments with different salary ranges
+
+**Performance Notes**:
+- Join operations should use indexed columns when possible
+- Window function approach scales better for large datasets
+- Consider department size distribution for optimization
+
+**Documentation**:
+- [pandas.DataFrame.merge](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.merge.html)
+- [GroupBy max operations](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.GroupBy.max.html)
+- [pandas.DataFrame.rank](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.rank.html)
+- [Merge suffixes](https://pandas.pydata.org/docs/user_guide/merging.html#overlapping-column-names)
+
+---
+
 ## Day 20: Data Reshaping
 
 ### Problem: Not Boring Movies
@@ -1071,6 +1873,142 @@ def not_boring_movies(cinema: pd.DataFrame) -> pd.DataFrame:
 - Multiple boolean conditions
 - Modulo arithmetic in filtering
 - Descending sort with `ascending=False`
+
+---
+
+### Problem: Rearrange Products Table
+**Difficulty**: Easy
+
+**Description**: 
+Rearrange the Products table so that each row has (product_id, store, price). If a product is not available in a store, do not include a row with that product_id and store combination in the result table.
+
+**Table Schema**:
+```sql
+Table: Products
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| product_id  | int     |
+| store1      | int     |
+| store2      | int     |
+| store3      | int     |
++-------------+---------+
+```
+
+**Sample Data**:
+| product_id | store1 | store2 | store3 |
+|------------|--------|--------|--------|
+| 0          | 95     | 100    | 105    |
+| 1          | 70     | null   | 80     |
+
+**Expected Output**:
+| product_id | store  | price |
+|------------|--------|-------|
+| 0          | store1 | 95    |
+| 0          | store2 | 100   |
+| 0          | store3 | 105   |
+| 1          | store1 | 70    |
+| 1          | store3 | 80    |
+
+**Solution**:
+```python
+import pandas as pd
+
+def rearrange_products_table(products: pd.DataFrame) -> pd.DataFrame:
+    # Melt the DataFrame to transform columns to rows
+    melted = products.melt(
+        id_vars=['product_id'],
+        value_vars=['store1', 'store2', 'store3'],
+        var_name='store',
+        value_name='price'
+    )
+    
+    # Remove rows where price is null (product not available in store)
+    result = melted.dropna(subset=['price'])
+    
+    # Convert price to integer (optional, for clean display)
+    result['price'] = result['price'].astype(int)
+    
+    return result
+```
+
+**Alternative Solution using stack():**
+```python
+import pandas as pd
+
+def rearrange_products_table(products: pd.DataFrame) -> pd.DataFrame:
+    # Set product_id as index
+    products_indexed = products.set_index('product_id')
+    
+    # Stack the store columns
+    stacked = products_indexed.stack().reset_index()
+    stacked.columns = ['product_id', 'store', 'price']
+    
+    # Remove null prices
+    result = stacked.dropna(subset=['price'])
+    result['price'] = result['price'].astype(int)
+    
+    return result
+```
+
+**Alternative Solution with manual unpivot:**
+```python
+import pandas as pd
+
+def rearrange_products_table(products: pd.DataFrame) -> pd.DataFrame:
+    result_list = []
+    
+    # Iterate through each product
+    for _, row in products.iterrows():
+        product_id = row['product_id']
+        
+        # Check each store
+        for store in ['store1', 'store2', 'store3']:
+            price = row[store]
+            if pd.notna(price):  # Only include if price is not null
+                result_list.append({
+                    'product_id': product_id,
+                    'store': store,
+                    'price': int(price)
+                })
+    
+    return pd.DataFrame(result_list)
+```
+
+**Reasoning**:
+1. **Data Reshaping**: Transform wide format (columns) to long format (rows)
+2. **Null Handling**: Remove entries where products aren't available in stores
+3. **Column Transformation**: Convert store columns to store values
+4. **Data Cleaning**: Remove missing values and ensure proper data types
+
+**Key Concepts**:
+- `melt()` for wide-to-long transformation
+- `stack()` for column-to-row conversion
+- `dropna()` for removing missing values
+- Wide vs. long data format conversion
+- Data normalization techniques
+
+**Reshape Methods Comparison**:
+- **melt()**: Most explicit and readable for this use case
+- **stack()**: More concise but requires index manipulation
+- **Manual iteration**: Most control but least efficient
+
+**Use Cases**:
+- Converting pivot tables back to normalized form
+- Preparing data for visualization libraries
+- Database normalization requirements
+- Creating consistent data structure for analysis
+
+**Performance Notes**:
+- `melt()` is optimized for reshape operations
+- `stack()` can be faster for simple cases
+- Manual iteration should be avoided for large datasets
+
+**Documentation**:
+- [pandas.DataFrame.melt](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.melt.html)
+- [pandas.DataFrame.stack](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.stack.html)
+- [Reshaping Data](https://pandas.pydata.org/docs/user_guide/reshaping.html)
+- [Wide to Long Format](https://pandas.pydata.org/docs/user_guide/reshaping.html#reshaping-by-melt)
 
 ---
 
@@ -1144,6 +2082,11 @@ def average_selling_price(prices: pd.DataFrame, units_sold: pd.DataFrame) -> pd.
 - Lambda functions in aggregation
 - Financial data formatting
 
+**Documentation**:
+- [Date Filtering](https://pandas.pydata.org/docs/user_guide/timeseries.html#indexing)
+- [Lambda in GroupBy](https://pandas.pydata.org/docs/user_guide/groupby.html#aggregation)
+- [pandas.DataFrame.round](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.round.html)
+
 ---
 
 ## Day 22: Advanced Analysis
@@ -1200,6 +2143,11 @@ def project_employees_i(project: pd.DataFrame, employee: pd.DataFrame) -> pd.Dat
 - Standard joins for data enrichment
 - Mean aggregation
 - Decimal formatting with `round()`
+
+**Documentation**:
+- [pandas.DataFrame.merge](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.merge.html)
+- [GroupBy mean operations](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.GroupBy.mean.html)
+- [pandas.DataFrame.round](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.round.html)
 
 ---
 
@@ -1266,6 +2214,11 @@ def users_percentage(users: pd.DataFrame, register: pd.DataFrame) -> pd.DataFram
 - Multi-criteria sorting
 - Mathematical transformations
 
+**Documentation**:
+- [pandas.DataFrame.sort_values](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.sort_values.html)
+- [GroupBy size operations](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.GroupBy.size.html)
+- [Mathematical Operations](https://pandas.pydata.org/docs/user_guide/basics.html#binary-operations)
+
 ---
 
 ## Day 24: Date Analysis
@@ -1322,6 +2275,158 @@ def queries_stats(queries: pd.DataFrame) -> pd.DataFrame:
 - Boolean to numeric conversion
 - Custom aggregation functions
 - Multiple metric calculations
+
+---
+
+### Problem: Count Salary Categories
+**Difficulty**: Medium
+
+**Description**: 
+Calculate the number of bank accounts for each salary category. The salary categories are:
+- "Low Salary": All the salaries strictly less than $20000.
+- "Average Salary": All the salaries in the inclusive range [$20000, $50000].
+- "High Salary": All the salaries strictly greater than $50000.
+
+**Table Schema**:
+```sql
+Table: Accounts
++-------------+------+
+| Column Name | Type |
++-------------+------+
+| account_id  | int  |
+| income      | int  |
++-------------+------+
+```
+
+**Sample Data**:
+| account_id | income |
+|------------|--------|
+| 3          | 108939 |
+| 2          | 12747  |
+| 8          | 87709  |
+| 6          | 91796  |
+
+**Expected Output**:
+| category       | accounts_count |
+|----------------|----------------|
+| Low Salary     | 1              |
+| Average Salary | 0              |
+| High Salary    | 3              |
+
+**Solution**:
+```python
+import pandas as pd
+
+def count_salary_categories(accounts: pd.DataFrame) -> pd.DataFrame:
+    # Define all categories to ensure they appear in result
+    categories = ['Low Salary', 'Average Salary', 'High Salary']
+    
+    # Categorize each account based on income
+    def categorize_salary(income):
+        if income < 20000:
+            return 'Low Salary'
+        elif income <= 50000:
+            return 'Average Salary'
+        else:
+            return 'High Salary'
+    
+    # Apply categorization
+    accounts['category'] = accounts['income'].apply(categorize_salary)
+    
+    # Count accounts per category
+    category_counts = accounts['category'].value_counts()
+    
+    # Ensure all categories are represented (with 0 if missing)
+    result_data = []
+    for category in categories:
+        count = category_counts.get(category, 0)
+        result_data.append({'category': category, 'accounts_count': count})
+    
+    return pd.DataFrame(result_data)
+```
+
+**Alternative Solution using pd.cut():**
+```python
+import pandas as pd
+
+def count_salary_categories(accounts: pd.DataFrame) -> pd.DataFrame:
+    # Define salary bins and labels
+    bins = [-float('inf'), 20000, 50000, float('inf')]
+    labels = ['Low Salary', 'Average Salary', 'High Salary']
+    
+    # Categorize salaries using cut
+    accounts['category'] = pd.cut(
+        accounts['income'], 
+        bins=bins, 
+        labels=labels, 
+        right=False,  # Left-inclusive intervals
+        include_lowest=True
+    )
+    
+    # Count categories and ensure all are present
+    category_counts = accounts['category'].value_counts()
+    
+    result_data = []
+    for label in labels:
+        count = category_counts.get(label, 0)
+        result_data.append({'category': label, 'accounts_count': count})
+    
+    return pd.DataFrame(result_data)
+```
+
+**Alternative Solution using conditions:**
+```python
+import pandas as pd
+
+def count_salary_categories(accounts: pd.DataFrame) -> pd.DataFrame:
+    # Count each category using boolean conditions
+    low_count = (accounts['income'] < 20000).sum()
+    avg_count = ((accounts['income'] >= 20000) & (accounts['income'] <= 50000)).sum()
+    high_count = (accounts['income'] > 50000).sum()
+    
+    # Create result DataFrame
+    result = pd.DataFrame({
+        'category': ['Low Salary', 'Average Salary', 'High Salary'],
+        'accounts_count': [low_count, avg_count, high_count]
+    })
+    
+    return result
+```
+
+**Reasoning**:
+1. **Salary Categorization**: Define clear income ranges for each category
+2. **Complete Coverage**: Ensure all possible categories appear in results
+3. **Zero Handling**: Include categories with zero accounts
+4. **Boundary Conditions**: Handle inclusive/exclusive range boundaries correctly
+5. **Consistent Output**: Always return all three categories
+
+**Key Concepts**:
+- `apply()` for custom categorization logic
+- `pd.cut()` for binning continuous data
+- `value_counts()` for counting categories
+- Boolean indexing for conditional counting
+- Handling missing categories in aggregation results
+
+**Categorization Methods Comparison**:
+- **apply() with function**: Most readable and flexible
+- **pd.cut()**: Optimized for binning operations
+- **Boolean conditions**: Most explicit and fastest for simple cases
+
+**Edge Cases Handled**:
+- Empty accounts table: All categories show 0
+- Missing categories: Explicitly include with 0 count
+- Boundary values: Correctly handle 20000 and 50000 thresholds
+
+**Performance Notes**:
+- Boolean condition approach is fastest for simple ranges
+- `pd.cut()` is more efficient for complex binning scenarios
+- `apply()` provides most flexibility but can be slower
+
+**Documentation**:
+- [pandas.DataFrame.apply](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.apply.html)
+- [pandas.cut](https://pandas.pydata.org/docs/reference/api/pandas.cut.html)
+- [pandas.Series.value_counts](https://pandas.pydata.org/docs/reference/api/pandas.Series.value_counts.html)
+- [Boolean Indexing](https://pandas.pydata.org/docs/user_guide/indexing.html#boolean-indexing)
 
 ---
 
@@ -1382,6 +2487,11 @@ def monthly_transactions(transactions: pd.DataFrame) -> pd.DataFrame:
 - Multi-dimensional grouping
 - Complex aggregation patterns
 
+**Documentation**:
+- [Date Period Operations](https://pandas.pydata.org/docs/user_guide/timeseries.html#time-span-representation)
+- [pandas.Series.dt.to_period](https://pandas.pydata.org/docs/reference/api/pandas.Series.dt.to_period.html)
+- [Multi-level GroupBy](https://pandas.pydata.org/docs/user_guide/groupby.html#grouping-with-a-grouper-specification)
+
 ---
 
 ## Day 26: Data Validation
@@ -1437,6 +2547,11 @@ def immediate_food_delivery(delivery: pd.DataFrame) -> pd.DataFrame:
 - Date equality comparisons
 - Mean for percentage calculations
 - Single value DataFrame creation
+
+**Documentation**:
+- [pandas.DataFrame.idxmin](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.idxmin.html)
+- [Date Comparisons](https://pandas.pydata.org/docs/user_guide/timeseries.html#comparisons)
+- [pandas.DataFrame.mean](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.mean.html)
 
 ---
 
@@ -1504,6 +2619,11 @@ def gameplay_analysis(activity: pd.DataFrame) -> pd.DataFrame:
 - Retention rate calculations
 - Player behavior analysis
 
+**Documentation**:
+- [pandas.Timedelta](https://pandas.pydata.org/docs/reference/api/pandas.Timedelta.html)
+- [Date Arithmetic](https://pandas.pydata.org/docs/user_guide/timedeltas.html)
+- [Merge on Multiple Columns](https://pandas.pydata.org/docs/user_guide/merging.html#joining-on-index)
+
 ---
 
 ## Day 28: Advanced Joins
@@ -1547,6 +2667,11 @@ def count_unique_subjects(teacher: pd.DataFrame) -> pd.DataFrame:
 - `nunique()` for unique value counting
 - Simple groupby operations
 - Column renaming in results
+
+**Documentation**:
+- [pandas.Series.nunique](https://pandas.pydata.org/docs/reference/api/pandas.Series.nunique.html)
+- [GroupBy Operations](https://pandas.pydata.org/docs/user_guide/groupby.html)
+- [Column Operations](https://pandas.pydata.org/docs/user_guide/basics.html#column-selection-addition-deletion)
 
 ---
 
@@ -1605,6 +2730,11 @@ def user_activity(activity: pd.DataFrame) -> pd.DataFrame:
 - Daily user aggregation
 - Time window analysis
 
+**Documentation**:
+- [pandas.to_datetime](https://pandas.pydata.org/docs/reference/api/pandas.to_datetime.html)
+- [pandas.Timedelta](https://pandas.pydata.org/docs/reference/api/pandas.Timedelta.html)
+- [Time Series Filtering](https://pandas.pydata.org/docs/user_guide/timeseries.html#indexing)
+
 ---
 
 ## Day 30: Comprehensive Analysis
@@ -1660,6 +2790,227 @@ def article_views(views: pd.DataFrame) -> pd.DataFrame:
 - Count-based filtering
 - Unique value extraction
 - Result sorting and formatting
+
+**Documentation**:
+- [Multi-level GroupBy](https://pandas.pydata.org/docs/user_guide/groupby.html#grouping-with-a-grouper-specification)
+- [GroupBy size operations](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.GroupBy.size.html)
+- [pandas.unique](https://pandas.pydata.org/docs/reference/api/pandas.unique.html)
+
+---
+
+## Additional Problems: Data Cleaning & Joins
+
+### Problem: Delete Duplicate Emails
+**Difficulty**: Easy
+
+**Description**: 
+Delete duplicate emails, keeping only the row with the smallest id for each email.
+
+**Table Schema**:
+```sql
+Table: Person
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| id          | int     |
+| email       | varchar |
++-------------+---------+
+```
+
+**Sample Data**:
+| id | email            |
+|----|------------------|
+| 1  | john@example.com |
+| 2  | bob@example.com  |
+| 3  | john@example.com |
+
+**Expected Output**:
+| id | email            |
+|----|------------------|
+| 1  | john@example.com |
+| 2  | bob@example.com  |
+
+**Solution**:
+```python
+import pandas as pd
+
+def delete_duplicate_emails(person: pd.DataFrame) -> pd.DataFrame:
+    # Keep the first occurrence (smallest id) for each email
+    person_cleaned = person.drop_duplicates(subset=['email'], keep='first')
+    
+    return person_cleaned
+```
+
+**Alternative Solution using groupby():**
+```python
+import pandas as pd
+
+def delete_duplicate_emails(person: pd.DataFrame) -> pd.DataFrame:
+    # Group by email and keep the row with minimum id
+    result = person.loc[person.groupby('email')['id'].idxmin()]
+    
+    return result.sort_values('id')
+```
+
+**Key Concepts**:
+- `drop_duplicates()` with subset and keep parameters
+- `groupby().idxmin()` for keeping minimum values
+- Data deduplication strategies
+
+**Documentation**:
+- [pandas.DataFrame.drop_duplicates](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.drop_duplicates.html)
+- [pandas.DataFrame.idxmin](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.idxmin.html)
+- [Data Deduplication](https://pandas.pydata.org/docs/user_guide/duplicates.html)
+
+---
+
+### Problem: Classes With At Least 5 Students
+**Difficulty**: Easy
+
+**Description**: 
+Find classes that have at least 5 students.
+
+**Table Schema**:
+```sql
+Table: Courses
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| student     | varchar |
+| class       | varchar |
++-------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def find_classes(courses: pd.DataFrame) -> pd.DataFrame:
+    # Count students per class
+    class_counts = courses.groupby('class').size().reset_index(name='student_count')
+    
+    # Filter classes with at least 5 students
+    result = class_counts[class_counts['student_count'] >= 5][['class']]
+    
+    return result
+```
+
+**Key Concepts**:
+- `groupby().size()` for counting rows
+- Threshold filtering
+- Column selection
+
+**Documentation**:
+- [GroupBy size operations](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.GroupBy.size.html)
+- [Boolean Filtering](https://pandas.pydata.org/docs/user_guide/indexing.html#boolean-indexing)
+- [Column Selection](https://pandas.pydata.org/docs/user_guide/indexing.html#selection-by-label)
+
+---
+
+### Problem: Customer Placing the Largest Number of Orders
+**Difficulty**: Easy
+
+**Description**: 
+Find the customer who has placed the largest number of orders.
+
+**Table Schema**:
+```sql
+Table: Orders
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| order_number| int     |
+| customer_number| int  |
++-------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def largest_orders(orders: pd.DataFrame) -> pd.DataFrame:
+    # Count orders per customer
+    customer_counts = orders.groupby('customer_number').size().reset_index(name='order_count')
+    
+    # Find customer with maximum orders
+    max_orders = customer_counts['order_count'].max()
+    result = customer_counts[customer_counts['order_count'] == max_orders][['customer_number']]
+    
+    return result
+```
+
+**Alternative Solution using idxmax():**
+```python
+import pandas as pd
+
+def largest_orders(orders: pd.DataFrame) -> pd.DataFrame:
+    # Count orders per customer
+    customer_counts = orders['customer_number'].value_counts()
+    
+    # Get customer with maximum orders
+    top_customer = customer_counts.idxmax()
+    
+    return pd.DataFrame({'customer_number': [top_customer]})
+```
+
+**Key Concepts**:
+- `value_counts()` for frequency analysis
+- `idxmax()` for finding maximum index
+- Maximum value identification
+
+**Documentation**:
+- [pandas.Series.value_counts](https://pandas.pydata.org/docs/reference/api/pandas.Series.value_counts.html)
+- [pandas.Series.idxmax](https://pandas.pydata.org/docs/reference/api/pandas.Series.idxmax.html)
+- [Statistical Functions](https://pandas.pydata.org/docs/user_guide/basics.html#descriptive-statistics)
+
+---
+
+### Problem: Replace Employee ID With The Unique Identifier
+**Difficulty**: Easy
+
+**Description**: 
+Show the unique ID of each user. If a user does not have a unique ID, show null.
+
+**Table Schema**:
+```sql
+Table: Employees
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| id            | int     |
+| name          | varchar |
++---------------+---------+
+
+Table: EmployeeUNI
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| id            | int     |
+| unique_id     | int     |
++---------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def replace_employee_id(employees: pd.DataFrame, employee_uni: pd.DataFrame) -> pd.DataFrame:
+    # Left join to include all employees
+    result = employees.merge(employee_uni, on='id', how='left')
+    
+    # Select only required columns
+    return result[['unique_id', 'name']]
+```
+
+**Key Concepts**:
+- Left joins to preserve all records
+- Handling missing values from joins
+- Table relationship management
+
+**Documentation**:
+- [pandas.DataFrame.merge](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.merge.html)
+- [Left Join Operations](https://pandas.pydata.org/docs/user_guide/merging.html#database-style-dataframe-or-named-series-joining-merging)
+- [Working with Missing Data](https://pandas.pydata.org/docs/user_guide/missing_data.html)
 
 ---
 
