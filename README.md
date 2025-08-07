@@ -2,7 +2,7 @@
 
 This comprehensive study guide covers the "30 Days of Pandas" challenge, providing structured solutions and explanations for data manipulation problems using pandas. Each problem includes complete analysis, solution code, and detailed reasoning.
 
-## 📚 Study Plan Overview
+## Study Plan Overview
 
 The 30 Days of Pandas challenge covers essential data manipulation concepts:
 - Data Filtering & Selection
@@ -13,7 +13,7 @@ The 30 Days of Pandas challenge covers essential data manipulation concepts:
 - Date/Time Manipulation
 - Advanced Data Analysis
 
-## 📋 Template Structure
+## Template Structure
 
 Each problem follows this format:
 - **Problem Description**: Clear explanation of the task
