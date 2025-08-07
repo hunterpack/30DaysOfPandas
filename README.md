@@ -1,1037 +1,1686 @@
+# 30 Days of Pandas – Study Guide
 
-# 30 Days of Pandas – Solutions
+This comprehensive study guide covers the "30 Days of Pandas" challenge, providing structured solutions and explanations for data manipulation problems using pandas. Each problem includes complete analysis, solution code, and detailed reasoning.
 
-This file lists all 30 problems from LeetCode's "30 Days of Pandas" study plan. For each day:
+## 📚 Study Plan Overview
 
-- **Question**: The problem statement.
-- **Solution**: Clean pandas code.
-- **Reasoning**: Textual explanation of each step.
-- **Documentation**: Descriptions of the pandas (or numpy) functions used.
+The 30 Days of Pandas challenge covers essential data manipulation concepts:
+- Data Filtering & Selection
+- Data Transformation
+- Aggregation & Grouping
+- Joining & Merging
+- String Operations
+- Date/Time Manipulation
+- Advanced Data Analysis
 
-### Day 1: Second Highest Salary (LeetCode 176)
-**Question:**
-Given a DataFrame `employee` with columns `id` and `salary`, return the second highest salary or None if it doesn't exist.
+## 📋 Template Structure
 
-**Solution:**
-```python
-import pandas as pd
+Each problem follows this format:
+- **Problem Description**: Clear explanation of the task
+- **Table Schema**: Input data structure in markdown tables
+- **Solution**: Complete pandas implementation
+- **Reasoning**: Step-by-step explanation
+- **Key Concepts**: Functions and methods used
+- **Documentation**: Links to relevant pandas documentation
 
-def second_highest_salary(employee: pd.DataFrame) -> pd.DataFrame:
-    salaries = employee['salary'].drop_duplicates().sort_values(ascending=False)
-    second = salaries.iloc[1] if len(salaries) >= 2 else None
-    return pd.DataFrame({'SecondHighestSalary': [second]})
+---
 
+## Day 1: Data Filtering
+
+### Problem: Big Countries
+**Difficulty**: Easy
+
+**Description**: 
+Find countries that are considered "big" based on area or population criteria.
+
+**Table Schema**:
+```sql
+Table: World
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| name        | varchar |
+| continent   | varchar |
+| area        | int     |
+| population  | int     |
+| gdp         | bigint  |
++-------------+---------+
 ```
 
-**Reasoning:**
-
-1.  Remove duplicate salary values to consider unique salaries only.
-    
-2.  Sort the salaries in descending order so the highest appear first.
-    
-3.  Select the second element if at least two exist; otherwise, return None.
-    
-
-**Documentation:**
-
--   `pandas.Series.drop_duplicates()`: Returns Series without duplicate values.
-    
--   `pandas.Series.sort_values(ascending=False)`: Sorts Series values in descending order.
-    
--   `Series.iloc`: Integer-location based indexing to select by position.
-    
-
-----------
-
-### Day 2: Nth Highest Salary (LeetCode 177)
-
-**Question:**  
-Given `employee` DataFrame and an integer `n`, return the nth highest salary or None if it doesn't exist.
-
-**Solution:**
-
-```python
-import pandas as pd
-
-def nth_highest_salary(employee: pd.DataFrame, n: int) -> pd.DataFrame:
-    salaries = employee['salary'].drop_duplicates().sort_values(ascending=False)
-    nth = salaries.iloc[n-1] if len(salaries) >= n else None
-    return pd.DataFrame({'NthHighestSalary': [nth]})
-
-```
-
-**Reasoning:**
-
-1.  Remove duplicate salaries to get distinct values.
-    
-2.  Sort descending to list highest salaries first.
-    
-3.  Use zero-based indexing to pick the (n-1)th element if available; else return None.
-    
-
-**Documentation:**
-
--   `pandas.Series.drop_duplicates()`: Drops duplicate entries in the Series.
-    
--   `pandas.Series.sort_values()`: Orders values; descending when `ascending=False`.
-    
--   `Series.iloc`: Access element by integer position.
-    
-
-----------
-
-### Day 3: Rank Scores (LeetCode 178)
-
-**Question:**  
-Given a `scores` DataFrame with columns `student` and `score`, assign a dense rank based on score descending.
-
-**Solution:**
-
-```python
-import pandas as pd
-
-def rank_scores(scores: pd.DataFrame) -> pd.DataFrame:
-    df = scores.copy()
-    df['rank'] = df['score'].rank(method='dense', ascending=False).astype(int)
-    return df[['student', 'score', 'rank']]
-
-```
-
-**Reasoning:**
-
-1.  Copy the DataFrame to avoid mutating the original.
-    
-2.  Apply a dense ranking on the `score` column: highest score gets rank 1, ties share rank, and next distinct score increments by 1.
-    
-3.  Convert the resulting float ranks to integers.
-    
-
-**Documentation:**
-
--   `DataFrame.copy()`: Creates a deep copy of the DataFrame.
-    
--   `pandas.Series.rank(method='dense', ascending=False)`: Assigns ranks with no gaps in ranking sequence.
-    
--   `Series.astype(int)`: Casts Series data to integer type.
-    
-
-----------
-
-### Day 4: Customers Who Never Order (LeetCode 183)
-
-**Question:**  
-Given DataFrames `customers` (with `id`) and `orders` (with `customer_id`), find customers who have no orders.
-
-**Solution:**
-
-```python
-import pandas as pd
-
-def customers_without_orders(customers: pd.DataFrame, orders: pd.DataFrame) -> pd.DataFrame:
-    ordered_ids = orders['customer_id'].unique()
-    return customers[~customers['id'].isin(ordered_ids)]
-
-```
-
-**Reasoning:**
-
-1.  Extract the array of unique `customer_id` values from the orders DataFrame.
-    
-2.  Filter the customers DataFrame to rows whose `id` is not in that array.
-    
-
-**Documentation:**
-
--   `Series.unique()`: Returns unique values of the Series.
-    
--   `Series.isin(values)`: Boolean mask indicating membership of Series values in given list/array.
-    
--   Boolean indexing: Filters DataFrame rows where mask is True.
-    
-
-----------
-
-### Day 5: Department Highest Salary (LeetCode 184)
-
-**Question:**  
-Given an `employee` DataFrame with columns `department` and `salary`, find each department's maximum salary.
-
-**Solution:**
-
-```python
-import pandas as pd
-
-def department_highest_salary(employee: pd.DataFrame) -> pd.DataFrame:
-    result = employee.groupby('department')['salary'].max().reset_index()
-    result.rename(columns={'salary': 'HighestSalary'}, inplace=True)
-    return result
-
-```
-
-**Reasoning:**
-
-1.  Group the employee DataFrame by `department`.
-    
-2.  Compute the maximum `salary` within each group.
-    
-3.  Reset the index to turn the grouped keys back into columns and rename the salary column.
-    
-
-**Documentation:**
-
--   `DataFrame.groupby('col')`: Groups rows by unique values in `col`.
-    
--   `Series.max()`: Returns the maximum value.
-    
--   `DataFrame.reset_index()`: Converts index levels into columns.
-    
--   `DataFrame.rename()`: Renames columns.
-    
-
-----------
-
-### Day 6: Delete Duplicate Emails (LeetCode 196)
-
-**Question:**  
-Given a DataFrame `person` with columns `id` and `email`, delete duplicate emails so only the row with the smallest `id` remains.
-
-**Solution:**
-
-```python
-import pandas as pd
-
-def delete_duplicate_emails(person: pd.DataFrame) -> pd.DataFrame:
-    df = person.sort_values(by='id')
-    return df.drop_duplicates(subset=['email'], keep='first')
-
-```
-
-**Reasoning:**
-
-1.  Sort rows by `id` ascending so the smallest id appears first for each email.
-    
-2.  Drop duplicate rows based on the `email` column, keeping the first occurrence.
-    
-
-**Documentation:**
-
--   `DataFrame.sort_values(by='col')`: Sorts rows by column values.
-    
--   `DataFrame.drop_duplicates(subset=[...], keep='first')`: Removes duplicate rows based on specified columns, keeping the first.
-    
-
-----------
-
-### Day 7: Game Play Analysis I (LeetCode 511)
-
-**Question:**  
-Given an `activity` DataFrame with columns `player_id` and `event_date`, find each player's first login date.
-
-**Solution:**
-
-```python
-import pandas as pd
-
-def game_play_analysis(activity: pd.DataFrame) -> pd.DataFrame:
-    df = activity.groupby('player_id')['event_date'].min().reset_index()
-    df.rename(columns={'event_date': 'first_login'}, inplace=True)
-    return df
-
-```
-
-**Reasoning:**
-
-1.  Group by `player_id`.
-    
-2.  Compute the minimum `event_date` per player, representing first login.
-    
-3.  Rename the resulting column for clarity.
-    
-
-**Documentation:**
-
--   `groupby('col')`: Groups rows by column.
-    
--   `Series.min()`: Returns minimum value.
-    
--   `reset_index()`: Converts group keys to columns.
-    
--   `rename()`: Renames columns.
-    
-
-----------
-
-### Day 8: Managers with at Least 5 Direct Reports (LeetCode 570)
-
-**Question:**  
-Given an `employee` DataFrame with columns `id`, `name`, and `managerId`, find the names of managers who have at least five direct reports.
-
-**Solution:**
-
-```python
-import pandas as pd
-
-def managers_with_direct_reports(employee: pd.DataFrame) -> pd.DataFrame:
-    counts = employee.groupby('managerId')['id'].count().reset_index(name='report_count')
-    managers = counts[counts['report_count'] >= 5]['managerId']
-    df = employee[employee['id'].isin(managers)][['id', 'name']].drop_duplicates()
-    return df[['name']]
-
-```
-
-**Reasoning:**
-
-1.  Group by `managerId` and count their direct reports.
-    
-2.  Filter managers with at least five reports.
-    
-3.  Retrieve the unique names of those managers.
-    
-
-**Documentation:**
-
--   `groupby()`: Groups rows by specified columns.
-    
--   `count()`: Counts non-null observations.
-    
--   `reset_index(name=…)`: Converts group keys into columns with a named aggregation column.
-    
--   `isin()`: Filters rows based on membership.
-    
--   `drop_duplicates()`: Removes duplicate rows.
-    
-
-----------
-
-### Day 9: Customer Placing the Largest Number of Orders (LeetCode 586)
-
-**Question:**  
-Given an `orders` DataFrame with columns `order_number` and `customer_number`, find the customer who placed the largest number of orders.
-
-**Solution:**
-
-```python
-import pandas as pd
-
-def customer_with_most_orders(orders: pd.DataFrame) -> pd.DataFrame:
-    counts = orders.groupby('customer_number')['order_number'].count()
-    top = counts.idxmax()
-    return pd.DataFrame({'customer_number': [top]})
-
-```
-
-**Reasoning:**
-
-1.  Count orders per customer by grouping and counting.
-    
-2.  Identify the customer_number with the highest count.
-    
-
-**Documentation:**
-
--   `groupby()`: Groups rows.
-    
--   `count()`: Tallies non-null entries.
-    
--   `idxmax()`: Returns the index of the first occurrence of the maximum value.
-    
-
-----------
-
-### Day 10: Big Countries (LeetCode 595)
-
-**Question:**  
-Given a `world` DataFrame with columns `name`, `continent`, `area`, `population`, and `gdp`, find all countries with `area >= 3000000` or `population >= 25000000`.
-
-**Solution:**
-
+**Sample Data**:
+| name        | continent | area    | population | gdp          |
+|-------------|-----------|---------|------------|--------------|
+| Afghanistan | Asia      | 652230  | 25500100   | 20343000000  |
+| Albania     | Europe    | 28748   | 2831741    | 12960000000  |
+| Algeria     | Africa    | 2381741 | 37100000   | 188681000000 |
+
+**Solution**:
 ```python
 import pandas as pd
 
 def big_countries(world: pd.DataFrame) -> pd.DataFrame:
-    df = world[(world['area'] >= 3000000) | (world['population'] >= 25000000)]
-    return df[['name', 'continent', 'area', 'population']]
-
+    # Filter countries that are big by area (>= 3000000) OR population (>= 25000000)
+    big_countries_df = world[
+        (world['area'] >= 3000000) | (world['population'] >= 25000000)
+    ]
+    
+    # Select only required columns
+    result = big_countries_df[['name', 'population', 'area']]
+    
+    return result
 ```
 
-**Reasoning:**
+**Reasoning**:
+1. **Filtering Logic**: Use boolean indexing with OR condition `|` to find countries meeting either criteria
+2. **Column Selection**: Extract only the required columns using bracket notation
+3. **Conditional Operators**: `>=` for numerical comparisons, `|` for logical OR
 
-1.  Apply boolean filtering for area or population thresholds.
-    
-2.  Select relevant columns for output.
-    
+**Key Concepts**:
+- `pd.DataFrame[]` - Boolean indexing for filtering
+- `|` - Logical OR operator for multiple conditions  
+- Column selection with list of column names
 
-**Documentation:**
+**Documentation**:
+- [Boolean Indexing](https://pandas.pydata.org/docs/user_guide/indexing.html#boolean-indexing)
+- [Comparison Operators](https://pandas.pydata.org/docs/reference/ops.html)
 
--   Boolean indexing with conditions.
-    
--   Column selection by list of column names.
-    
+---
 
-----------
+## Day 2: Data Selection
 
-### Day 11: Classes More Than 5 Students (LeetCode 596)
+### Problem: Recyclable and Low Fat Products
+**Difficulty**: Easy
 
-**Question:**  
-Given a `courses` DataFrame with columns `student` and `class`, list classes that have more than 5 distinct students.
+**Description**: 
+Find products that are both low fat and recyclable.
 
-**Solution:**
-
-```python
-import pandas as pd
-
-def classes_more_than_five(courses: pd.DataFrame) -> pd.DataFrame:
-    counts = courses.groupby('class')['student'].nunique().reset_index(name='student_count')
-    df = counts[counts['student_count'] > 5]
-    return df[['class']]
-
+**Table Schema**:
+```sql
+Table: Products
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| product_id  | int     |
+| low_fats    | enum    |
+| recyclable  | enum    |
++-------------+---------+
 ```
 
-**Reasoning:**
-
-1.  Group by class and count unique students.
-    
-2.  Filter classes where the count exceeds five.
-    
-
-**Documentation:**
-
--   `nunique()`: Counts distinct values.
-    
--   `reset_index(name=…)`: Converts grouped indices to columns with named count.
-    
-
-----------
-
-### Day 12: Sales Person (LeetCode 607)
-
-**Question:**  
-Given a `sales` DataFrame with columns `sales_person` and `amount`, find the salesperson with the highest total sales amount.
-
-**Solution:**
-
-```python
-import pandas as pd
-
-def top_salesperson(sales: pd.DataFrame) -> pd.DataFrame:
-    totals = sales.groupby('sales_person')['amount'].sum()
-    top = totals.idxmax()
-    return pd.DataFrame({'sales_person': [top]})
-
-```
-
-**Reasoning:**
-
-1.  Sum the amount per salesperson.
-    
-2.  Identify the salesperson with the maximum total.
-    
-
-**Documentation:**
-
--   `sum()`: Adds values in each group.
-    
--   `idxmax()`: Finds index of maximum.
-    
-
-----------
-
-### Day 13: Actors and Directors Who Cooperated At Least Three Times (LeetCode 1050)
-
-**Question:**  
-Given a `production` DataFrame with columns `actor_id` and `director_id`, find all pairs that have worked together three or more times.
-
-**Solution:**
-
-```python
-import pandas as pd
-
-def frequent_pairs(production: pd.DataFrame) -> pd.DataFrame:
-    counts = production.groupby(['actor_id', 'director_id']).size().reset_index(name='times')
-    df = counts[counts['times'] >= 3]
-    return df[['actor_id', 'director_id']]
-
-```
-
-**Reasoning:**
-
-1.  Group by both actor and director IDs and count occurrences.
-    
-2.  Filter pairs with counts of at least three.
-    
-
-**Documentation:**
-
--   `size()`: Returns group sizes.
-    
--   Boolean filtering on the times column.
-    
-
-----------
-
-### Day 14: Article Views I (LeetCode 1148)
-
-**Question:**  
-Given a `views` DataFrame with columns `article_id`, `author_id`, and `viewer_id`, identify authors who have viewed their own articles.
-
-**Solution:**
-
-```python
-import pandas as pd
-
-def self_viewing_authors(views: pd.DataFrame) -> pd.DataFrame:
-    df = views[views['author_id'] == views['viewer_id']]
-    df = df[['author_id']].drop_duplicates().rename(columns={'author_id': 'id'})
-    return df.sort_values('id').reset_index(drop=True)
-
-```
-
-**Reasoning:**
-
-1.  Filter rows where `author_id` equals `viewer_id`.
-    
-2.  Select and dedupe the `author_id` column, renaming it to `id`.
-    
-3.  Sort and reset the index for neatness.
-    
-
-**Documentation:**
-
--   Equality comparison for boolean indexing.
-    
--   `drop_duplicates()`: Removes duplicate rows.
-    
--   `rename()`: Changes column names.
-    
--   `sort_values()`: Orders rows by column.
-    
-
-----------
-
-### Day 15: Immediate Food Delivery I (LeetCode 1173)
-
-**Question:**  
-Given a `delivery` DataFrame with columns `order_date` and `customer_pref_delivery_date`, compute the percentage of orders delivered immediately (same day).
-
-**Solution:**
-
-```python
-import pandas as pd
-
-def immediate_delivery_percentage(delivery: pd.DataFrame) -> pd.DataFrame:
-    total = len(delivery)
-    immediate = (delivery['order_date'] == delivery['customer_pref_delivery_date']).sum()
-    percent = round(immediate / total * 100, 2)
-    return pd.DataFrame({'immediate_percentage': [percent]})
-
-```
-
-**Reasoning:**
-
-1.  Count total orders.
-    
-2.  Count orders where the order date matches the preferred delivery date.
-    
-3.  Calculate the percentage and round to two decimals.
-    
-
-**Documentation:**
-
--   Comparison operator on Series returns boolean Series.
-    
--   `sum()` on boolean Series counts True values.
-    
--   `round()` for numeric rounding.
-    
-
-----------
-
-### Day 16: Students and Examinations (LeetCode 1280)
-
-**Question:**  
-Given a `scores` DataFrame with columns `student` and `score`, return students who scored above the average.
-
-**Solution:**
-
-```python
-import pandas as pd
-
-def above_average_students(scores: pd.DataFrame) -> pd.DataFrame:
-    avg = scores['score'].mean()
-    return scores[scores['score'] > avg]
-
-```
-
-**Reasoning:**
-
-1.  Compute the average score.
-    
-2.  Filter rows where the score exceeds that average.
-    
-
-**Documentation:**
-
--   `mean()`: Computes the average of Series.
-    
--   Boolean indexing for filtering.
-    
-
-----------
-
-### Day 17: Replace Employee ID With The Unique Identifier (LeetCode 1378)
-
-**Question:**  
-Given an `employee` DataFrame with columns `id` and `name`, create a new column `unique_id` by concatenating `name` and `id` with an underscore.
-
-**Solution:**
-
-```python
-import pandas as pd
-
-def replace_employee_id(employee: pd.DataFrame) -> pd.DataFrame:
-    employee['unique_id'] = employee['name'] + '_' + employee['id'].astype(str)
-    return employee[['unique_id']]
-
-```
-
-**Reasoning:**
-
-1.  Convert `id` to string and concatenate with `name`.
-    
-2.  Return only the new column.
-    
-
-**Documentation:**
-
--   `astype(str)`: Casts values to string.
-    
--   String concatenation on Series.
-    
-
-----------
-
-### Day 18: Group Sold Products By The Date (LeetCode 1484)
-
-**Question:**  
-Given a `sales` DataFrame with columns `product`, `date`, and `amount`, compute total `amount` sold per product per date.
-
-**Solution:**
-
-```python
-import pandas as pd
-
-def group_sold_products(sales: pd.DataFrame) -> pd.DataFrame:
-    df = sales.groupby(['date', 'product'])['amount'].sum().reset_index()
-    return df
-
-```
-
-**Reasoning:**
-
-1.  Group by both `date` and `product`.
-    
-2.  Sum the `amount` in each group.
-    
-3.  Reset index to flatten the grouped DataFrame.
-    
-
-**Documentation:**
-
--   `groupby()` with multiple keys.
-    
--   Aggregation with `sum()`.
-    
--   `reset_index()`.
-    
-
-----------
-
-### Day 19: Find Users With Valid E-Mails (LeetCode 1517)
-
-**Question:**  
-Given a `users` DataFrame with column `email`, return rows where `email` matches a simple regex pattern.
-
-**Solution:**
-
-```python
-import pandas as pd
-import re
-
-def valid_emails(users: pd.DataFrame) -> pd.DataFrame:
-    pattern = r'^[A-Za-z\d]+@[A-Za-z\d]+\.[A-Za-z]{2,}$'
-    return users[users['email'].str.contains(pattern, regex=True)]
-
-```
-
-**Reasoning:**
-
-1.  Define a regex for basic email validation.
-    
-2.  Use string contains to filter rows matching the pattern.
-    
-
-**Documentation:**
-
--   `str.contains()`: Tests each string for pattern match.
-    
--   Regular expression basics.
-    
-
-----------
-
-### Day 20: Patients With a Condition (LeetCode 1527)
-
-**Question:**  
-Given a `patients` DataFrame with columns `patient_id` and `condition`, return rows where `condition` equals a given string.
-
-**Solution:**
-
-```python
-import pandas as pd
-
-def patients_with_condition(patients: pd.DataFrame, cond: str) -> pd.DataFrame:
-    return patients[patients['condition'] == cond]
-
-```
-
-**Reasoning:**
-
-1.  Compare the `condition` column to the target string.
-    
-2.  Filter and return matching rows.
-    
-
-**Documentation:**
-
--   Boolean indexing for equality comparison.
-    
-
-----------
-
-### Day 21: Fix Names in a Table (LeetCode 1667)
-
-**Question:**  
-Given a `users` DataFrame with column `name`, capitalize the first letter and lowercase the rest.
-
-**Solution:**
-
-```python
-import pandas as pd
-
-def fix_names(users: pd.DataFrame) -> pd.DataFrame:
-    users['name'] = users['name'].str.capitalize()
-    return users
-
-```
-
-**Reasoning:**
-
-1.  Use the string capitalize method to adjust casing.
-    
-2.  Return the modified DataFrame.
-    
-
-**Documentation:**
-
--   `str.capitalize()`: Capitalizes first character and lowers the rest.
-    
-
-----------
-
-### Day 22: Invalid Tweets (LeetCode 1683)
-
-**Question:**  
-Given a `tweets` DataFrame with column `tweet` and a list of banned words, return tweets containing any banned word.
-
-**Solution:**
-
-```python
-import pandas as pd
-import re
-
-def invalid_tweets(tweets: pd.DataFrame, banned: list) -> pd.DataFrame:
-    pattern = '|'.join(map(re.escape, banned))
-    return tweets[tweets['tweet'].str.contains(pattern, regex=True)]
-
-```
-
-**Reasoning:**
-
-1.  Escape banned words and join them into a regex OR pattern.
-    
-2.  Filter tweets containing any of those words.
-    
-
-**Documentation:**
-
--   `re.escape()`: Escapes special regex characters.
-    
--   `str.contains()`: Filters strings by regex match.
-    
-
-----------
-
-### Day 23: Daily Leads and Partners (LeetCode 1693)
-
-**Question:**  
-Given a `leads` DataFrame with columns `partner` and `date`, count leads per partner per day.
-
-**Solution:**
-
-```python
-import pandas as pd
-
-def daily_leads(leads: pd.DataFrame) -> pd.DataFrame:
-    df = leads.groupby(['partner', 'date'])['lead_id'].count().reset_index(name='lead_count')
-    return df
-
-```
-
-**Reasoning:**
-
-1.  Group by both `partner` and `date`.
-    
-2.  Count the `lead_id` entries in each group.
-    
-3.  Reset index and name the count column.
-    
-
-**Documentation:**
-
--   `count()` on grouped Series.
-    
--   `reset_index(name=…)`.
-    
-
-----------
-
-### Day 24: Find Total Time Spent by Each Employee (LeetCode 1741)
-
-**Question:**  
-Given an `employees` DataFrame with columns `emp_id`, `in_time`, and `out_time`, compute total time spent per employee.
-
-**Solution:**
-
-```python
-import pandas as pd
-
-def total_time_spent(employees: pd.DataFrame) -> pd.DataFrame:
-    employees['duration'] = employees['out_time'] - employees['in_time']
-    df = employees.groupby('emp_id')['duration'].sum().reset_index(name='total_time')
-    return df
-
-```
-
-**Reasoning:**
-
-1.  Compute duration for each row by subtracting datetime columns.
-    
-2.  Group by `emp_id` and sum durations.
-    
-3.  Reset index and name the aggregated column.
-    
-
-**Documentation:**
-
--   Datetime subtraction yields timedelta.
-    
--   `sum()` on timedelta Series.
-    
--   `reset_index(name=…)`.
-    
-
-----------
-
-### Day 25: Recyclable and Low Fat Products (LeetCode 1757)
-
-**Question:**  
-Given a `products` DataFrame with columns `product_id`, `low_fats`, and `recyclable`, find products where both flags are 'Y'.
-
-**Solution:**
-
+**Solution**:
 ```python
 import pandas as pd
 
 def find_products(products: pd.DataFrame) -> pd.DataFrame:
-    return products[(products['low_fats'] == 'Y') & (products['recyclable'] == 'Y')][['product_id']]
-
+    # Filter products that are both low fat AND recyclable
+    filtered_products = products[
+        (products['low_fats'] == 'Y') & (products['recyclable'] == 'Y')
+    ]
+    
+    # Return only product_id column
+    result = filtered_products[['product_id']]
+    
+    return result
 ```
 
-**Reasoning:**
+**Reasoning**:
+1. **Multiple Conditions**: Use `&` (AND) operator to combine two conditions
+2. **String Comparison**: Direct equality comparison with string values
+3. **Single Column Selection**: Return DataFrame with one column using list notation
 
-1.  Apply boolean mask for both conditions.
-    
-2.  Select the `product_id` column.
-    
+**Key Concepts**:
+- `&` - Logical AND operator
+- String equality comparison in pandas
+- Single column DataFrame selection
 
-**Documentation:**
+---
 
--   Boolean operators on Series.
-    
--   Column selection.
-    
+## Day 3: String Methods
 
-----------
+### Problem: Find Customer Referee
+**Difficulty**: Easy
 
-### Day 26: Rearrange Products Table (LeetCode 1795)
+**Description**: 
+Find customers who were not referred by customer with id = 2.
 
-**Question:**  
-Given a wide-format `products` DataFrame with columns `product_id`, `store1_price`, `store2_price`, etc., reshape into long format.
-
-**Solution:**
-
+**Solution**:
 ```python
 import pandas as pd
 
-def rearrange_products(products: pd.DataFrame) -> pd.DataFrame:
-    return pd.melt(products, id_vars=['product_id'], value_vars=[col for col in products.columns if col.endswith('_price')], var_name='store', value_name='price')
-
+def find_customer_referee(customer: pd.DataFrame) -> pd.DataFrame:
+    # Find customers NOT referred by customer id 2
+    # Handle both null values and id != 2
+    result = customer[
+        (customer['referee_id'] != 2) | (customer['referee_id'].isna())
+    ]
+    
+    return result[['name']]
 ```
 
-**Reasoning:**
+**Reasoning**:
+1. **Null Handling**: Use `isna()` to check for null/NaN values
+2. **Negation Logic**: Use `!=` for "not equal" comparison
+3. **OR Logic**: Include both null values and non-matching IDs
 
-1.  Identify price columns by naming convention.
-    
-2.  Use melt to reshape from wide to long.
-    
+**Key Concepts**:
+- `isna()` - Check for missing values
+- `!=` - Not equal comparison
+- Handling null values in filtering
 
-**Documentation:**
+---
 
--   `pandas.melt()`: Converts wide tables to long format.
-    
+## Day 4: Data Transformation
 
-----------
+### Problem: Article Views
+**Difficulty**: Easy
 
-### Day 27: Calculate Special Bonus (LeetCode 1873)
+**Description**: 
+Find authors who viewed their own articles, sorted by id.
 
-**Question:**  
-Given an `employee` DataFrame with columns `salary` and `bonus`, add `special_bonus` = 1.0 if `bonus > salary * 0.03`, else 0.0.
-
-**Solution:**
-
-```python
-import pandas as pd
-import numpy as np
-
-def calculate_special_bonus(employee: pd.DataFrame) -> pd.DataFrame:
-    employee['special_bonus'] = np.where(employee['bonus'] > employee['salary'] * 0.03, 1.0, 0.0)
-    return employee
-
-```
-
-**Reasoning:**
-
-1.  Compute the condition on salary and bonus.
-    
-2.  Use numpy.where for vectorized assignment.
-    
-
-**Documentation:**
-
--   `numpy.where()`: Vectorized conditional selection.
-    
-
-----------
-
-### Day 28: Count Salary Categories (LeetCode 1907)
-
-**Question:**  
-Given an `employee` DataFrame with column `salary`, categorize into bins and count each category.
-
-**Solution:**
-
-```python
-import pandas as pd
-import numpy as np
-
-def count_salary_categories(employee: pd.DataFrame) -> pd.DataFrame:
-    bins = [0, 10000, 20000, 30000, np.inf]
-    labels = ['Low', 'Medium', 'High', 'Very High']
-    employee['category'] = pd.cut(employee['salary'], bins=bins, labels=labels)
-    return employee['category'].value_counts().reset_index(name='count').rename(columns={'index': 'category'})
-
-```
-
-**Reasoning:**
-
-1.  Define numerical bins and labels.
-    
-2.  Use pd.cut to assign each salary to a category.
-    
-3.  Count occurrences of each category.
-    
-
-**Documentation:**
-
--   `pd.cut()`: Bins continuous data into discrete intervals.
-    
--   `value_counts()`: Counts unique values.
-    
--   `reset_index(name=…)`: Formats counts into DataFrame.
-    
-
-----------
-
-### Day 29: The Number of Rich Customers (LeetCode 2082)
-
-**Question:**  
-Given a `customer` DataFrame with columns `id`, `income`, and `threshold`, return the number of customers with income greater than threshold.
-
-**Solution:**
-
+**Solution**:
 ```python
 import pandas as pd
 
-def rich_customers(customer: pd.DataFrame) -> pd.DataFrame:
-    count = (customer['income'] > customer['threshold']).sum()
-    return pd.DataFrame({'rich_customers': [count]})
-
+def article_views(views: pd.DataFrame) -> pd.DataFrame:
+    # Find rows where author_id equals viewer_id
+    self_views = views[views['author_id'] == views['viewer_id']]
+    
+    # Get unique author_ids and sort them
+    unique_authors = self_views['author_id'].drop_duplicates().sort_values()
+    
+    # Create result DataFrame
+    result = pd.DataFrame({'id': unique_authors})
+    
+    return result
 ```
 
-**Reasoning:**
+**Reasoning**:
+1. **Column Comparison**: Compare two columns within the same DataFrame
+2. **Deduplication**: Use `drop_duplicates()` to get unique values
+3. **Sorting**: Use `sort_values()` for ascending order
+4. **DataFrame Creation**: Build new DataFrame with renamed column
 
-1.  Compare `income` and `threshold` to create a boolean Series.
+**Key Concepts**:
+- Column-to-column comparison
+- `drop_duplicates()` - Remove duplicate values
+- `sort_values()` - Sort DataFrame/Series
+- `pd.DataFrame()` - Create new DataFrame
+
+---
+
+## Day 5: Data Aggregation
+
+### Problem: Invalid Tweets
+**Difficulty**: Easy
+
+**Description**: 
+Find tweet IDs where the content is longer than 15 characters.
+
+**Table Schema**:
+```sql
+Table: Tweets
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| tweet_id       | int     |
+| content        | varchar |
++----------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def invalid_tweets(tweets: pd.DataFrame) -> pd.DataFrame:
+    # Filter tweets with content longer than 15 characters
+    invalid = tweets[tweets['content'].str.len() > 15]
     
-2.  Sum True values to count.
+    # Return only tweet_id column
+    return invalid[['tweet_id']]
+```
+
+**Reasoning**:
+1. **String Length**: Use `.str.len()` to get character count of string column
+2. **Numerical Comparison**: Apply `>` operator to length values
+3. **Column Selection**: Extract only the required tweet_id column
+
+**Key Concepts**:
+- `.str.len()` - Get string length in pandas
+- String accessor methods with `.str`
+- Length-based filtering
+
+---
+
+## Day 6: String Operations
+
+### Problem: Calculate Special Bonus
+**Difficulty**: Easy
+
+**Description**: 
+Calculate bonus for employees based on conditions: bonus = salary if employee_id is odd and name doesn't start with 'M', otherwise bonus = 0.
+
+**Table Schema**:
+```sql
+Table: Employees
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| employee_id | int     |
+| name        | varchar |
+| salary      | int     |
++-------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def calculate_special_bonus(employees: pd.DataFrame) -> pd.DataFrame:
+    # Create bonus column based on conditions
+    employees['bonus'] = employees.apply(
+        lambda row: row['salary'] 
+        if (row['employee_id'] % 2 == 1) and (not row['name'].startswith('M'))
+        else 0, 
+        axis=1
+    )
     
-
-**Documentation:**
-
--   Boolean comparison on Series.
+    # Return employee_id and bonus, sorted by employee_id
+    result = employees[['employee_id', 'bonus']].sort_values('employee_id')
     
--   `sum()` on boolean Seriescounts True values.
+    return result
+```
+
+**Reasoning**:
+1. **Conditional Logic**: Use `apply()` with lambda for complex conditional assignment
+2. **Modulo Operation**: `% 2 == 1` checks for odd numbers
+3. **String Methods**: `startswith()` for string pattern matching
+4. **Sorting**: `sort_values()` to order results
+
+**Key Concepts**:
+- `apply()` with lambda functions
+- `startswith()` string method
+- Modulo operator `%` for odd/even checking
+- Complex conditional logic in pandas
+
+---
+
+## Day 7: Data Selection & Sorting
+
+### Problem: Fix Names in a Table
+**Difficulty**: Easy
+
+**Description**: 
+Fix names so that only the first character is uppercase and the rest are lowercase, then sort by user_id.
+
+**Table Schema**:
+```sql
+Table: Users
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| user_id        | int     |
+| name           | varchar |
++----------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def fix_names(users: pd.DataFrame) -> pd.DataFrame:
+    # Fix name capitalization
+    users['name'] = users['name'].str.capitalize()
     
+    # Sort by user_id
+    result = users.sort_values('user_id')
+    
+    return result
+```
 
-----------
+**Reasoning**:
+1. **String Transformation**: Use `.str.capitalize()` to fix capitalization
+2. **In-place Modification**: Assign back to the same column
+3. **Sorting**: Order results by user_id
 
-### Day 30: Number of Unique Subjects Taught by Each Teacher (LeetCode 2356)
+**Key Concepts**:
+- `.str.capitalize()` - Proper case conversion
+- Column assignment and modification
+- Basic sorting operations
 
-**Question:**  
-Given a `teacher` DataFrame with columns `teacher_id` and `subject_id`, count unique subjects per teacher.
+---
 
-**Solution:**
+## Day 8: Date Operations
 
+### Problem: Patients With a Condition
+**Difficulty**: Easy
+
+**Description**: 
+Find patients who have Type I Diabetes (conditions containing 'DIAB1' prefix).
+
+**Table Schema**:
+```sql
+Table: Patients
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| patient_id     | int     |
+| patient_name   | varchar |
+| conditions     | varchar |
++----------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def find_patients(patients: pd.DataFrame) -> pd.DataFrame:
+    # Find patients with DIAB1 condition (word boundary)
+    diab1_patients = patients[
+        patients['conditions'].str.contains(r'\bDIAB1', na=False, regex=True)
+    ]
+    
+    return diab1_patients
+```
+
+**Reasoning**:
+1. **Pattern Matching**: Use `.str.contains()` with regex for flexible matching
+2. **Word Boundaries**: `\b` ensures DIAB1 is a complete word/code
+3. **Null Handling**: `na=False` treats NaN as False
+4. **Regex Flag**: `regex=True` enables regular expression patterns
+
+**Key Concepts**:
+- `.str.contains()` with regex patterns
+- Word boundary regex `\b`
+- Handling null values in string operations
+- Regular expressions in pandas
+
+---
+
+## Day 9: Data Aggregation - GroupBy
+
+### Problem: Group Sold Products By The Date
+**Difficulty**: Easy
+
+**Description**: 
+Group products sold by date and show count and comma-separated product names.
+
+**Table Schema**:
+```sql
+Table: Activities
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| sell_date      | date    |
+| product        | varchar |
++----------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def categorize_products(activities: pd.DataFrame) -> pd.DataFrame:
+    # Group by sell_date and aggregate
+    result = activities.groupby('sell_date').agg(
+        num_sold=('product', 'nunique'),
+        products=('product', lambda x: ','.join(sorted(x.unique())))
+    ).reset_index()
+    
+    return result
+```
+
+**Reasoning**:
+1. **GroupBy Operations**: Group by date to aggregate products per day
+2. **Multiple Aggregations**: Use `agg()` with dictionary for different functions
+3. **Unique Count**: `nunique()` counts distinct products
+4. **String Aggregation**: Lambda function to join unique sorted products
+5. **Reset Index**: Convert grouped result back to DataFrame
+
+**Key Concepts**:
+- `groupby()` operations
+- `agg()` with multiple functions
+- `nunique()` for unique counts
+- Lambda functions in aggregation
+- `reset_index()` for DataFrame conversion
+
+---
+
+## Day 10: Advanced GroupBy
+
+### Problem: Daily Leads and Partners
+**Difficulty**: Easy
+
+**Description**: 
+Find unique lead_id and partner_id counts for each date_id and make_name combination.
+
+**Table Schema**:
+```sql
+Table: DailySales
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| date_id        | date    |
+| make_name      | varchar |
+| lead_id        | int     |
+| partner_id     | int     |
++----------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def daily_leads_and_partners(daily_sales: pd.DataFrame) -> pd.DataFrame:
+    # Group by date_id and make_name, count unique leads and partners
+    result = daily_sales.groupby(['date_id', 'make_name']).agg(
+        unique_leads=('lead_id', 'nunique'),
+        unique_partners=('partner_id', 'nunique')
+    ).reset_index()
+    
+    return result
+```
+
+**Reasoning**:
+1. **Multi-level GroupBy**: Group by multiple columns
+2. **Unique Counting**: Count distinct values for each group
+3. **Column Renaming**: Provide meaningful names in aggregation
+
+**Key Concepts**:
+- Multi-column groupby
+- `nunique()` aggregation
+- Meaningful column naming in aggregation
+
+---
+
+## Day 11: Data Merging
+
+### Problem: Employee Bonus
+**Difficulty**: Easy
+
+**Description**: 
+Report name and bonus of employees with bonus less than 1000.
+
+**Table Schema**:
+```sql
+Table: Employee
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| empId       | int     |
+| name        | varchar |
+| supervisor  | int     |
+| salary      | int     |
++-------------+---------+
+
+Table: Bonus
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| empId       | int     |
+| bonus       | int     |
++-------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def employee_bonus(employee: pd.DataFrame, bonus: pd.DataFrame) -> pd.DataFrame:
+    # Left join to include all employees
+    merged = employee.merge(bonus, on='empId', how='left')
+    
+    # Filter employees with bonus < 1000 or no bonus (null)
+    result = merged[
+        (merged['bonus'] < 1000) | (merged['bonus'].isna())
+    ][['name', 'bonus']]
+    
+    return result
+```
+
+**Reasoning**:
+1. **Left Join**: Preserve all employees, even those without bonuses
+2. **Null Handling**: Include employees with no bonus records
+3. **Filtering**: Apply bonus condition after merge
+4. **Column Selection**: Return only required columns
+
+**Key Concepts**:
+- `merge()` operations and join types
+- Left joins with `how='left'`
+- Post-merge filtering
+- Handling null values from joins
+
+---
+
+## Day 12: String Processing
+
+### Problem: Students and Examinations
+**Difficulty**: Easy
+
+**Description**: 
+Show how many times each student attended each exam.
+
+**Table Schema**:
+```sql
+Table: Students
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| student_id     | int     |
+| student_name   | varchar |
++----------------+---------+
+
+Table: Subjects
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| subject_name   | varchar |
++----------------+---------+
+
+Table: Examinations
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| student_id     | int     |
+| subject_name   | varchar |
++----------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def students_and_examinations(students: pd.DataFrame, subjects: pd.DataFrame, 
+                            examinations: pd.DataFrame) -> pd.DataFrame:
+    # Create cartesian product of students and subjects
+    student_subject = students.merge(subjects, how='cross')
+    
+    # Count examinations per student-subject combination
+    exam_counts = examinations.groupby(['student_id', 'subject_name']).size().reset_index(name='attended_exams')
+    
+    # Left join to include all student-subject combinations
+    result = student_subject.merge(
+        exam_counts, 
+        on=['student_id', 'subject_name'], 
+        how='left'
+    )
+    
+    # Fill missing counts with 0
+    result['attended_exams'] = result['attended_exams'].fillna(0).astype(int)
+    
+    # Sort results
+    result = result.sort_values(['student_id', 'subject_name'])
+    
+    return result[['student_id', 'student_name', 'subject_name', 'attended_exams']]
+```
+
+**Reasoning**:
+1. **Cross Join**: Create all possible student-subject combinations
+2. **Counting**: Use `groupby().size()` to count occurrences
+3. **Left Join**: Preserve all combinations, even with zero exams
+4. **Fill Missing**: Replace NaN with 0 for missing exam counts
+5. **Type Conversion**: Convert to integer for clean display
+
+**Key Concepts**:
+- Cross joins with `how='cross'`
+- `groupby().size()` for counting
+- `fillna()` for missing value handling
+- `astype()` for type conversion
+
+---
+
+## Day 13: Advanced Filtering
+
+### Problem: Managers with at Least 5 Direct Reports
+**Difficulty**: Medium
+
+**Description**: 
+Find managers who have at least 5 direct reports.
+
+**Table Schema**:
+```sql
+Table: Employee
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| id          | int     |
+| name        | varchar |
+| department  | varchar |
+| managerId   | int     |
++-------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def find_managers(employee: pd.DataFrame) -> pd.DataFrame:
+    # Count direct reports per manager
+    manager_counts = employee.groupby('managerId').size().reset_index(name='direct_reports')
+    
+    # Filter managers with at least 5 direct reports
+    qualified_managers = manager_counts[manager_counts['direct_reports'] >= 5]
+    
+    # Join back to get manager names
+    result = employee.merge(
+        qualified_managers,
+        left_on='id',
+        right_on='managerId'
+    )[['name']]
+    
+    return result
+```
+
+**Reasoning**:
+1. **Counting Groups**: Count employees per manager
+2. **Threshold Filtering**: Find managers meeting minimum requirement
+3. **Self Join**: Join employee table with itself to get manager details
+4. **Column Mapping**: Use different column names in join
+
+**Key Concepts**:
+- Self-referencing joins
+- Groupby counting with threshold filtering
+- Multi-step data transformation
+
+---
+
+## Day 14: Data Transformation
+
+### Problem: Sales Person
+**Difficulty**: Easy
+
+**Description**: 
+Find salespeople who did not have any orders related to company 'RED'.
+
+**Table Schema**:
+```sql
+Table: SalesPerson
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| sales_id       | int     |
+| name           | varchar |
+| salary         | int     |
+| commission_rate| int     |
+| hire_date      | date    |
++----------------+---------+
+
+Table: Company
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| com_id         | int     |
+| name           | varchar |
+| city           | varchar |
++----------------+---------+
+
+Table: Orders
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| order_id       | int     |
+| order_date     | date    |
+| com_id         | int     |
+| sales_id       | int     |
+| amount         | int     |
++----------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def sales_person(sales_person: pd.DataFrame, company: pd.DataFrame, 
+                orders: pd.DataFrame) -> pd.DataFrame:
+    # Find RED company ID
+    red_company = company[company['name'] == 'RED']
+    
+    if red_company.empty:
+        return sales_person[['name']]
+    
+    red_com_id = red_company['com_id'].iloc[0]
+    
+    # Find sales people who sold to RED
+    red_sales = orders[orders['com_id'] == red_com_id]['sales_id'].unique()
+    
+    # Filter out salespeople who sold to RED
+    result = sales_person[~sales_person['sales_id'].isin(red_sales)][['name']]
+    
+    return result
+```
+
+**Reasoning**:
+1. **Company Lookup**: Find the specific company by name
+2. **Sales Identification**: Get salespeople who dealt with target company
+3. **Negation Filter**: Use `~` and `isin()` to exclude unwanted records
+4. **Edge Case Handling**: Handle case where company doesn't exist
+
+**Key Concepts**:
+- `isin()` for membership testing
+- `~` operator for negation
+- Multi-table filtering logic
+- Edge case handling
+
+---
+
+## Day 15: Complex Joins
+
+### Problem: Customer Who Visited but Did Not Make Any Transactions
+**Difficulty**: Easy
+
+**Description**: 
+Find customers who visited but made no transactions.
+
+**Table Schema**:
+```sql
+Table: Visits
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| visit_id       | int     |
+| customer_id    | int     |
++----------------+---------+
+
+Table: Transactions
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| transaction_id | int     |
+| visit_id       | int     |
+| amount         | int     |
++----------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def find_customers(visits: pd.DataFrame, transactions: pd.DataFrame) -> pd.DataFrame:
+    # Left join visits with transactions
+    merged = visits.merge(transactions, on='visit_id', how='left')
+    
+    # Find visits with no transactions (null transaction_id)
+    no_transactions = merged[merged['transaction_id'].isna()]
+    
+    # Count visits per customer
+    result = no_transactions.groupby('customer_id').size().reset_index(name='count_no_trans')
+    
+    return result
+```
+
+**Reasoning**:
+1. **Left Join**: Preserve all visits, mark unmatched as null
+2. **Null Detection**: Find visits without corresponding transactions
+3. **Aggregation**: Count no-transaction visits per customer
+
+**Key Concepts**:
+- Left joins to detect missing relationships
+- Null value detection after joins
+- Aggregation on filtered results
+
+---
+
+## Day 16: Window Functions Alternative
+
+### Problem: Rising Temperature
+**Difficulty**: Easy
+
+**Description**: 
+Find days where temperature was higher than the previous day.
+
+**Table Schema**:
+```sql
+Table: Weather
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| id             | int     |
+| recordDate     | date    |
+| temperature    | int     |
++----------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def rising_temperature(weather: pd.DataFrame) -> pd.DataFrame:
+    # Sort by date
+    weather = weather.sort_values('recordDate')
+    
+    # Create previous day temperature using shift
+    weather['prev_temp'] = weather['temperature'].shift(1)
+    weather['prev_date'] = weather['recordDate'].shift(1)
+    
+    # Check if consecutive days and temperature rose
+    weather['date_diff'] = (weather['recordDate'] - weather['prev_date']).dt.days
+    
+    rising_days = weather[
+        (weather['date_diff'] == 1) & 
+        (weather['temperature'] > weather['prev_temp'])
+    ]
+    
+    return rising_days[['id']]
+```
+
+**Reasoning**:
+1. **Data Sorting**: Ensure chronological order
+2. **Lag Values**: Use `shift()` to get previous day data
+3. **Date Arithmetic**: Calculate day differences
+4. **Consecutive Filtering**: Ensure we're comparing adjacent days
+
+**Key Concepts**:
+- `shift()` for lag/lead operations
+- Date arithmetic with `.dt.days`
+- Window-like operations without window functions
+
+---
+
+## Day 17: Aggregation & Ranking
+
+### Problem: Game Play Analysis I
+**Difficulty**: Easy
+
+**Description**: 
+Find the first login date for each player.
+
+**Table Schema**:
+```sql
+Table: Activity
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| player_id      | int     |
+| device_id      | int     |
+| event_date     | date    |
+| games_played   | int     |
++----------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def game_analysis(activity: pd.DataFrame) -> pd.DataFrame:
+    # Group by player and find minimum date
+    first_login = activity.groupby('player_id')['event_date'].min().reset_index()
+    
+    # Rename column to match expected output
+    first_login.columns = ['player_id', 'first_login']
+    
+    return first_login
+```
+
+**Reasoning**:
+1. **GroupBy Aggregation**: Group players and find earliest date
+2. **Min Function**: Get minimum date per group
+3. **Column Renaming**: Provide meaningful column names
+
+**Key Concepts**:
+- `groupby()` with single column aggregation
+- `min()` aggregation function
+- Column renaming techniques
+
+---
+
+## Day 18: Advanced String Operations
+
+### Problem: Triangle Judgement
+**Difficulty**: Easy
+
+**Description**: 
+Determine if three lengths can form a triangle.
+
+**Table Schema**:
+```sql
+Table: Triangle
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| x              | int     |
+| y              | int     |
+| z              | int     |
++----------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def triangle_judgement(triangle: pd.DataFrame) -> pd.DataFrame:
+    # Apply triangle inequality theorem
+    triangle['triangle'] = triangle.apply(
+        lambda row: 'Yes' if (
+            row['x'] + row['y'] > row['z'] and
+            row['x'] + row['z'] > row['y'] and
+            row['y'] + row['z'] > row['x']
+        ) else 'No',
+        axis=1
+    )
+    
+    return triangle
+```
+
+**Reasoning**:
+1. **Mathematical Logic**: Apply triangle inequality theorem
+2. **Row-wise Operations**: Use `apply()` with `axis=1`
+3. **Conditional Assignment**: Complex if-else logic in lambda
+
+**Key Concepts**:
+- `apply()` with complex logic
+- Mathematical conditions in pandas
+- String result assignment
+
+---
+
+## Day 19: Advanced Grouping
+
+### Problem: Biggest Single Number
+**Difficulty**: Easy
+
+**Description**: 
+Find the largest number that appears only once.
+
+**Table Schema**:
+```sql
+Table: MyNumbers
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| num            | int     |
++----------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def biggest_single_number(my_numbers: pd.DataFrame) -> pd.DataFrame:
+    # Count frequency of each number
+    num_counts = my_numbers['num'].value_counts()
+    
+    # Find numbers that appear only once
+    single_numbers = num_counts[num_counts == 1]
+    
+    # Get the largest single number
+    if single_numbers.empty:
+        result = pd.DataFrame({'num': [None]})
+    else:
+        largest_single = single_numbers.index.max()
+        result = pd.DataFrame({'num': [largest_single]})
+    
+    return result
+```
+
+**Reasoning**:
+1. **Frequency Counting**: Use `value_counts()` to count occurrences
+2. **Filtering**: Find numbers with count = 1
+3. **Max Finding**: Get largest from filtered results
+4. **Edge Cases**: Handle case where no single numbers exist
+
+**Key Concepts**:
+- `value_counts()` for frequency analysis
+- Index operations on Series
+- Edge case handling with empty results
+
+---
+
+## Day 20: Data Reshaping
+
+### Problem: Not Boring Movies
+**Difficulty**: Easy
+
+**Description**: 
+Find movies with odd ID and description not equal to 'boring', ordered by rating.
+
+**Table Schema**:
+```sql
+Table: Cinema
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| id             | int     |
+| movie          | varchar |
+| description    | varchar |
+| rating         | float   |
++----------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def not_boring_movies(cinema: pd.DataFrame) -> pd.DataFrame:
+    # Filter movies with odd ID and not boring description
+    filtered = cinema[
+        (cinema['id'] % 2 == 1) & 
+        (cinema['description'] != 'boring')
+    ]
+    
+    # Sort by rating in descending order
+    result = filtered.sort_values('rating', ascending=False)
+    
+    return result
+```
+
+**Reasoning**:
+1. **Multiple Conditions**: Combine odd ID check and string comparison
+2. **Modulo Operation**: Check for odd numbers
+3. **String Inequality**: Filter out specific description
+4. **Descending Sort**: Order by rating (highest first)
+
+**Key Concepts**:
+- Multiple boolean conditions
+- Modulo arithmetic in filtering
+- Descending sort with `ascending=False`
+
+---
+
+## Day 21: Data Analysis
+
+### Problem: Average Selling Price
+**Difficulty**: Easy
+
+**Description**: 
+Calculate average selling price for each product.
+
+**Table Schema**:
+```sql
+Table: Prices
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| product_id     | int     |
+| start_date     | date    |
+| end_date       | date    |
+| price          | int     |
++----------------+---------+
+
+Table: UnitsSold
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| product_id     | int     |
+| purchase_date  | date    |
+| units          | int     |
++----------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def average_selling_price(prices: pd.DataFrame, units_sold: pd.DataFrame) -> pd.DataFrame:
+    # Merge on product_id and date ranges
+    merged = units_sold.merge(prices, on='product_id')
+    
+    # Filter for valid date ranges
+    valid_sales = merged[
+        (merged['purchase_date'] >= merged['start_date']) & 
+        (merged['purchase_date'] <= merged['end_date'])
+    ]
+    
+    # Calculate total revenue and units per product
+    product_summary = valid_sales.groupby('product_id').agg(
+        total_revenue=('price', lambda x: sum(x * valid_sales.loc[x.index, 'units'])),
+        total_units=('units', 'sum')
+    ).reset_index()
+    
+    # Calculate average price
+    product_summary['average_price'] = (
+        product_summary['total_revenue'] / product_summary['total_units']
+    ).round(2)
+    
+    return product_summary[['product_id', 'average_price']]
+```
+
+**Reasoning**:
+1. **Date Range Joins**: Merge and filter by date conditions
+2. **Weighted Averages**: Calculate using total revenue / total units
+3. **Complex Aggregation**: Use lambda functions for custom calculations
+4. **Rounding**: Format financial results appropriately
+
+**Key Concepts**:
+- Date range filtering after joins
+- Weighted average calculations
+- Lambda functions in aggregation
+- Financial data formatting
+
+---
+
+## Day 22: Advanced Analysis
+
+### Problem: Project Employees I
+**Difficulty**: Easy
+
+**Description**: 
+Calculate average experience years for each project.
+
+**Table Schema**:
+```sql
+Table: Project
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| project_id     | int     |
+| employee_id    | int     |
++----------------+---------+
+
+Table: Employee
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| employee_id    | int     |
+| name           | varchar |
+| experience_years| int    |
++----------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def project_employees_i(project: pd.DataFrame, employee: pd.DataFrame) -> pd.DataFrame:
+    # Join project and employee data
+    merged = project.merge(employee, on='employee_id')
+    
+    # Calculate average experience per project
+    result = merged.groupby('project_id')['experience_years'].mean().reset_index()
+    
+    # Round to 2 decimal places
+    result['average_years'] = result['experience_years'].round(2)
+    
+    return result[['project_id', 'average_years']]
+```
+
+**Reasoning**:
+1. **Inner Join**: Combine project and employee information
+2. **GroupBy Mean**: Calculate average experience per project
+3. **Rounding**: Format decimal places for presentation
+
+**Key Concepts**:
+- Standard joins for data enrichment
+- Mean aggregation
+- Decimal formatting with `round()`
+
+---
+
+## Day 23: Multiple Aggregations
+
+### Problem: Percentage of Users Attended a Contest
+**Difficulty**: Easy
+
+**Description**: 
+Calculate participation percentage for each contest.
+
+**Table Schema**:
+```sql
+Table: Users
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| user_id        | int     |
+| user_name      | varchar |
++----------------+---------+
+
+Table: Register
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| contest_id     | int     |
+| user_id        | int     |
++----------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def users_percentage(users: pd.DataFrame, register: pd.DataFrame) -> pd.DataFrame:
+    # Get total number of users
+    total_users = len(users)
+    
+    # Count registrations per contest
+    contest_counts = register.groupby('contest_id').size().reset_index(name='registered_users')
+    
+    # Calculate percentage
+    contest_counts['percentage'] = (
+        (contest_counts['registered_users'] / total_users) * 100
+    ).round(2)
+    
+    # Sort by percentage desc, then contest_id asc
+    result = contest_counts.sort_values(
+        ['percentage', 'contest_id'], 
+        ascending=[False, True]
+    )
+    
+    return result[['contest_id', 'percentage']]
+```
+
+**Reasoning**:
+1. **Total Count**: Get baseline for percentage calculation
+2. **Group Counting**: Count participants per contest
+3. **Percentage Math**: Calculate and format percentages
+4. **Multi-column Sort**: Sort by percentage (desc) then ID (asc)
+
+**Key Concepts**:
+- Percentage calculations in pandas
+- Multi-criteria sorting
+- Mathematical transformations
+
+---
+
+## Day 24: Date Analysis
+
+### Problem: Queries Quality and Percentage
+**Difficulty**: Easy
+
+**Description**: 
+Calculate query quality and poor query percentage.
+
+**Table Schema**:
+```sql
+Table: Queries
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| query_name     | varchar |
+| result         | varchar |
+| position       | int     |
+| rating         | int     |
++----------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def queries_stats(queries: pd.DataFrame) -> pd.DataFrame:
+    # Calculate quality and poor query metrics
+    queries['quality_score'] = queries['rating'] / queries['position']
+    queries['poor_query'] = (queries['rating'] < 3).astype(int)
+    
+    # Group by query_name and calculate metrics
+    result = queries.groupby('query_name').agg(
+        quality=('quality_score', 'mean'),
+        poor_query_percentage=('poor_query', lambda x: (x.sum() / len(x)) * 100)
+    ).reset_index()
+    
+    # Round results
+    result['quality'] = result['quality'].round(2)
+    result['poor_query_percentage'] = result['poor_query_percentage'].round(2)
+    
+    return result
+```
+
+**Reasoning**:
+1. **Calculated Columns**: Create intermediate calculations
+2. **Boolean to Integer**: Convert boolean to numeric for calculations
+3. **Custom Aggregation**: Use lambda for percentage calculation
+4. **Multiple Metrics**: Calculate different statistics per group
+
+**Key Concepts**:
+- Calculated column creation
+- Boolean to numeric conversion
+- Custom aggregation functions
+- Multiple metric calculations
+
+---
+
+## Day 25: Advanced Filtering
+
+### Problem: Monthly Transactions I
+**Difficulty**: Medium
+
+**Description**: 
+Calculate monthly transaction statistics.
+
+**Table Schema**:
+```sql
+Table: Transactions
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| id             | int     |
+| country        | varchar |
+| state          | enum    |
+| amount         | int     |
+| trans_date     | date    |
++----------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def monthly_transactions(transactions: pd.DataFrame) -> pd.DataFrame:
+    # Extract year-month from date
+    transactions['month'] = transactions['trans_date'].dt.to_period('M').astype(str)
+    
+    # Create approved transaction indicator
+    transactions['approved'] = (transactions['state'] == 'approved').astype(int)
+    transactions['approved_amount'] = transactions['amount'] * transactions['approved']
+    
+    # Group by month and country
+    result = transactions.groupby(['month', 'country']).agg(
+        trans_count=('id', 'count'),
+        approved_count=('approved', 'sum'),
+        trans_total_amount=('amount', 'sum'),
+        approved_total_amount=('approved_amount', 'sum')
+    ).reset_index()
+    
+    return result
+```
+
+**Reasoning**:
+1. **Date Extraction**: Use `dt.to_period()` for month grouping
+2. **Conditional Amounts**: Calculate approved amounts separately
+3. **Multi-level Grouping**: Group by both time and categorical dimensions
+4. **Multiple Aggregations**: Count transactions and sum amounts
+
+**Key Concepts**:
+- Date period extraction with `dt.to_period()`
+- Conditional amount calculations
+- Multi-dimensional grouping
+- Complex aggregation patterns
+
+---
+
+## Day 26: Data Validation
+
+### Problem: Immediate Food Delivery II
+**Difficulty**: Medium
+
+**Description**: 
+Calculate percentage of immediate first orders.
+
+**Table Schema**:
+```sql
+Table: Delivery
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| delivery_id    | int     |
+| customer_id    | int     |
+| order_date     | date    |
+| customer_pref_delivery_date | date |
++----------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def immediate_food_delivery(delivery: pd.DataFrame) -> pd.DataFrame:
+    # Find first order for each customer
+    first_orders = delivery.loc[delivery.groupby('customer_id')['order_date'].idxmin()]
+    
+    # Check if first order was immediate
+    first_orders['immediate'] = (
+        first_orders['order_date'] == first_orders['customer_pref_delivery_date']
+    ).astype(int)
+    
+    # Calculate percentage
+    immediate_percentage = (first_orders['immediate'].mean() * 100).round(2)
+    
+    result = pd.DataFrame({'immediate_percentage': [immediate_percentage]})
+    
+    return result
+```
+
+**Reasoning**:
+1. **First Record Selection**: Use `idxmin()` to find first order per customer
+2. **Date Comparison**: Compare order and preferred delivery dates
+3. **Percentage Calculation**: Calculate overall percentage across customers
+4. **Single Value Result**: Return single percentage value
+
+**Key Concepts**:
+- `idxmin()` for first record selection
+- Date equality comparisons
+- Mean for percentage calculations
+- Single value DataFrame creation
+
+---
+
+## Day 27: Complex Analytics
+
+### Problem: Game Play Analysis IV
+**Difficulty**: Medium
+
+**Description**: 
+Calculate fraction of players who logged in again the day after first login.
+
+**Table Schema**:
+```sql
+Table: Activity
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| player_id      | int     |
+| device_id      | int     |
+| event_date     | date    |
+| games_played   | int     |
++----------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def gameplay_analysis(activity: pd.DataFrame) -> pd.DataFrame:
+    # Find first login date for each player
+    first_login = activity.groupby('player_id')['event_date'].min().reset_index()
+    first_login.columns = ['player_id', 'first_login']
+    
+    # Calculate next day date
+    first_login['next_day'] = first_login['first_login'] + pd.Timedelta(days=1)
+    
+    # Check if player logged in the next day
+    next_day_activity = activity.merge(
+        first_login,
+        left_on=['player_id', 'event_date'],
+        right_on=['player_id', 'next_day'],
+        how='inner'
+    )
+    
+    # Calculate fraction
+    total_players = first_login['player_id'].nunique()
+    returning_players = next_day_activity['player_id'].nunique()
+    
+    fraction = round(returning_players / total_players, 2) if total_players > 0 else 0
+    
+    result = pd.DataFrame({'fraction': [fraction]})
+    
+    return result
+```
+
+**Reasoning**:
+1. **First Login Identification**: Find each player's first activity date
+2. **Date Arithmetic**: Add one day to first login date
+3. **Exact Date Matching**: Check for activity on specific next day
+4. **Fraction Calculation**: Calculate retention rate
+
+**Key Concepts**:
+- Date arithmetic with `pd.Timedelta()`
+- Exact date matching in joins
+- Retention rate calculations
+- Player behavior analysis
+
+---
+
+## Day 28: Advanced Joins
+
+### Problem: Number of Unique Subjects Taught by Each Teacher
+**Difficulty**: Easy
+
+**Description**: 
+Count unique subjects taught by each teacher.
+
+**Table Schema**:
+```sql
+Table: Teacher
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| teacher_id     | int     |
+| subject_id     | int     |
+| dept_id        | int     |
++----------------+---------+
+```
+
+**Solution**:
 ```python
 import pandas as pd
 
 def count_unique_subjects(teacher: pd.DataFrame) -> pd.DataFrame:
-    return teacher.groupby('teacher_id')['subject_id'].nunique().reset_index(name='cnt')
-
+    # Count unique subjects per teacher
+    result = teacher.groupby('teacher_id')['subject_id'].nunique().reset_index()
+    result.columns = ['teacher_id', 'cnt']
+    
+    return result
 ```
 
-**Reasoning:**
+**Reasoning**:
+1. **Unique Counting**: Use `nunique()` to count distinct subjects
+2. **Simple Grouping**: Group by teacher and count subjects
+3. **Column Renaming**: Provide expected output column names
 
-1.  Group by `teacher_id`.
-    
-2.  Count distinct `subject_id` per group.
-    
-3.  Reset index with appropriate column name.
-    
+**Key Concepts**:
+- `nunique()` for unique value counting
+- Simple groupby operations
+- Column renaming in results
 
-**Documentation:**
+---
 
--   `groupby()`: Groups rows.
+## Day 29: Data Quality
+
+### Problem: User Activity for the Past 30 Days I
+**Difficulty**: Easy
+
+**Description**: 
+Find daily active user count for the last 30 days ending 2019-07-27.
+
+**Table Schema**:
+```sql
+Table: Activity
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| user_id        | int     |
+| session_id     | int     |
+| activity_date  | date    |
+| activity_type  | enum    |
++----------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def user_activity(activity: pd.DataFrame) -> pd.DataFrame:
+    # Define the date range (30 days ending 2019-07-27)
+    end_date = pd.to_datetime('2019-07-27')
+    start_date = end_date - pd.Timedelta(days=29)  # 30 days total
     
--   `nunique()`: Counts unique values.
+    # Filter activities in date range
+    recent_activity = activity[
+        (activity['activity_date'] >= start_date) & 
+        (activity['activity_date'] <= end_date)
+    ]
     
--   `reset_index(name=…)`.
+    # Count unique users per day
+    result = recent_activity.groupby('activity_date')['user_id'].nunique().reset_index()
+    result.columns = ['day', 'active_users']
+    
+    return result
+```
+
+**Reasoning**:
+1. **Date Range Definition**: Calculate 30-day window ending on specific date
+2. **Date Filtering**: Filter activities within the specified range
+3. **Daily Aggregation**: Count unique users per day
+4. **Column Naming**: Provide meaningful column names
+
+**Key Concepts**:
+- Date range calculations
+- Date filtering with boolean indexing
+- Daily user aggregation
+- Time window analysis
+
+---
+
+## Day 30: Comprehensive Analysis
+
+### Problem: Article Views II
+**Difficulty**: Medium
+
+**Description**: 
+Find users who viewed at least one article by the same author on the same day.
+
+**Table Schema**:
+```sql
+Table: Views
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| article_id     | int     |
+| author_id      | int     |
+| viewer_id      | int     |
+| view_date      | date    |
++----------------+---------+
+```
+
+**Solution**:
+```python
+import pandas as pd
+
+def article_views(views: pd.DataFrame) -> pd.DataFrame:
+    # Group by viewer, author, and date to find multiple views
+    viewer_author_day = views.groupby(['viewer_id', 'author_id', 'view_date']).size().reset_index(name='view_count')
+    
+    # Find cases where viewer saw multiple articles by same author on same day
+    multiple_views = viewer_author_day[viewer_author_day['view_count'] >= 2]
+    
+    # Get unique viewers who had this behavior
+    result_viewers = multiple_views['viewer_id'].unique()
+    
+    # Create result DataFrame and sort
+    result = pd.DataFrame({'id': sorted(result_viewers)})
+    
+    return result
+```
+
+**Reasoning**:
+1. **Multi-dimensional Grouping**: Group by viewer, author, and date
+2. **Count Aggregation**: Count articles viewed per group
+3. **Threshold Filtering**: Find groups with multiple views
+4. **Unique Extraction**: Get unique viewers meeting criteria
+5. **Sorting**: Order results for consistent output
+
+**Key Concepts**:
+- Complex multi-dimensional grouping
+- Count-based filtering
+- Unique value extraction
+- Result sorting and formatting
+
+---
+
+## 🔗 Resources
+
+- [Pandas Documentation](https://pandas.pydata.org/docs/)
+- [Pandas User Guide](https://pandas.pydata.org/docs/user_guide/index.html)
+- [Boolean Indexing Guide](https://pandas.pydata.org/docs/user_guide/indexing.html#boolean-indexing)
+- [GroupBy Operations](https://pandas.pydata.org/docs/user_guide/groupby.html)
+
+## 📝 Study Notes
+
+### Essential Pandas Methods
+- **Filtering**: `df[condition]`, `df.query()`
+- **Selection**: `df['col']`, `df[['col1', 'col2']]`
+- **Aggregation**: `df.groupby().agg()`, `df.sum()`, `df.count()`
+- **Sorting**: `df.sort_values()`, `df.sort_index()`
+- **String Operations**: `df['col'].str.method()`
+- **Date Operations**: `pd.to_datetime()`, `df.dt.method()`
+
+### Common Patterns
+1. **Filter → Select → Transform**: Most common data manipulation pattern
+2. **Group → Aggregate → Reset**: Standard aggregation workflow  
+3. **Merge → Filter → Select**: Join and filter workflow
